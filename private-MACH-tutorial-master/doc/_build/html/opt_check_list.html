@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-run checklists and troubleshooting &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Optimization with ADflow" href="overset_opt.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Pre-run checklists and troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/opt_check_list.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="pre-run-checklists-and-troubleshooting">
+<h1>Pre-run checklists and troubleshooting<a class="headerlink" href="#pre-run-checklists-and-troubleshooting" title="Permalink to this headline"></a></h1>
+<p>Here we list several things to check before running optimizations with MACH and some tips on how to troubleshoot.
+These are meant to be used along with the <span class="xref std std-ref">General Checklists</span> in the MDO Lab Guide.</p>
+<div class="section" id="before-you-run-checklists">
+<h2>Before you run (checklists)<a class="headerlink" href="#before-you-run-checklists" title="Permalink to this headline"></a></h2>
+<p>You should always call the <code class="xref py py-meth docutils literal notranslate"><span class="pre">printSparsity()</span></code> method of your pyOptSparse “optimization problem” object (i.e., your instance of the <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimization</span></code> class).
+In our example scripts this can be done by adding the line <code class="docutils literal notranslate"><span class="pre">optProb.printSparsity()</span></code> before the command that runs the optimization.
+This will print some output that should be checked to make sure that the necessary variables and constraints have been added before you leave the case there to run.
+The following is an example.</p>
+<a class="reference internal image-reference" href="_images/opt_print_sparsity.png"><img alt="_images/opt_print_sparsity.png" src="_images/opt_print_sparsity.png" style="width: 390.40000000000003px; height: 153.20000000000002px;" /></a>
+<p>This allows us to check which constraints and design variables have been added, how many of each, and which design variables each function depends on.</p>
+<div class="section" id="aerodynamic-optimization">
+<h3>Aerodynamic optimization<a class="headerlink" href="#aerodynamic-optimization" title="Permalink to this headline"></a></h3>
+<ol class="arabic">
+<li><p>Check the relative density between your FFD control points and surface mesh nodes. The general rule of thumb is that there should be at least 4 mesh nodes between two FFD control points.</p></li>
+<li><p>Test your geometric design variables to make sure they behave as expected and that the ranges are reasonable (e.g., they don’t cause negative cell volumes). You can use <code class="docutils literal notranslate"><span class="pre">demoDesignVars</span></code> in <code class="docutils literal notranslate"><span class="pre">pygeo</span></code> to perform the perturbation demo. See <a class="reference internal" href="#negative-volumes"><span class="std std-ref">negative cell volumes check</span></a> for how to identify negative cell volumes. Pay extra attention to this when you use multi-level FFDs.</p></li>
+<li><p>If you want to rotate the FFD in different directions, check more details about how the reference axis is defined in the code’s docstrings. There are different rotation types that can be defined using <code class="docutils literal notranslate"><span class="pre">rotType</span></code>. This option basically determines the ordering of performing the rotation.</p></li>
+<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">raySize</span></code> (used in <code class="docutils literal notranslate"><span class="pre">addRefAxis</span></code>) is sufficient for your case. You might need to increase it if you have a highly swept design.</p></li>
+<li><p>If you have multi-level FFDs, check that all the necessary options are specified and that the constraints are properly added. For example, if you have child FFDs, when you specify the LETE constraints, make sure that the <code class="docutils literal notranslate"><span class="pre">childIdx</span></code> is given. Otherwise it will be added to the parent FFD.</p></li>
+<li><p>Check if the geometric constraints have been properly added. Use DVConstraints’ <code class="docutils literal notranslate"><span class="pre">writeTecplot</span></code> method for this (e.g., <code class="docutils literal notranslate"><span class="pre">DVCon.writeTecplot(os.path.join(outputDirectory,</span> <span class="pre">&quot;constraints.dat&quot;))</span></code>). This will output a file that allows visualizing the constraints with Tecplot. Open this file in tecplot, select <code class="docutils literal notranslate"><span class="pre">3D</span> <span class="pre">cartesian</span></code>, and turn on the <code class="docutils literal notranslate"><span class="pre">Mesh</span></code> option. Different constraints are shown in different zones. The following is an example with the wing surface superimposed to show what this should look like (thickness and LETE constraints).</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/opt_constraints_dat.png"><img alt="_images/opt_constraints_dat.png" src="_images/opt_constraints_dat.png" style="width: 375.3px; height: 262.2px;" /></a>
+</div></blockquote>
+</li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">checkSolutionFailure</span></code> and <code class="docutils literal notranslate"><span class="pre">checkAdjointFailure</span></code> in ADflow will set the value for <code class="docutils literal notranslate"><span class="pre">funcs['fail']</span></code> and <code class="docutils literal notranslate"><span class="pre">funcsSens['fail']</span></code> respectively, based on the analysis and adjoint solutions. However, they are not passed into <code class="docutils literal notranslate"><span class="pre">pyOptsparse</span></code> if you are not using <code class="docutils literal notranslate"><span class="pre">multipointSparse</span></code>. If you want to use them without <code class="docutils literal notranslate"><span class="pre">multipointSparse</span></code>, you need to manually return them,  i.e. <code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">funcs,</span> <span class="pre">funcs['fail']</span></code> and similarly for <code class="docutils literal notranslate"><span class="pre">funcsSens</span></code>.</p></li>
+<li><p>Check if you have specified all the necessary variables of interest in <code class="docutils literal notranslate"><span class="pre">volumevariables</span></code> and <code class="docutils literal notranslate"><span class="pre">surfacevariables</span></code>. Keep in mind that increasing the number of variables being stored will increase the file sizes (especially for volume files), which may be problematic if you have storage or file-transfer limitations.</p></li>
+<li><p>Check if the <code class="docutils literal notranslate"><span class="pre">LdefFact</span></code> is sufficient. You might need to increase it if you have a large deformation. Check more details in <span class="xref std std-ref">IDWarp options</span> (also see other options).</p></li>
+<li><p>One general rule of thumb is to set the adjoint tolerance two orders of magnitude lower than the target optimality. Based on past experience, the adjoint solution tends to be an order or two less accurate than the required optimality for numerical reasons.</p></li>
+<li><p>Check your load balancing, including the ADflow load balancing across procs and the multipoint balancing. For multipoint cases, you want the evaluation for each condition to take approximately the same time. Check not only the analysis, but also the adjoints (they can be more costly).</p></li>
+<li><p>Check the geometry changes during the early stage of your optimization, and make sure the changes are as expected.</p></li>
+</ol>
+</div>
+<div class="section" id="optimization-with-overset-meshes">
+<h3>Optimization with overset meshes<a class="headerlink" href="#optimization-with-overset-meshes" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>Check that you have <code class="docutils literal notranslate"><span class="pre">blank</span></code> in <code class="docutils literal notranslate"><span class="pre">volumevariables</span></code>.</p></li>
+<li><p>Even if the implicit hole cutting does not output any errors, double check that your volume cells have iblank values that make sense (see <a class="reference internal" href="overset_ihcc.html#overset-ihcc"><span class="std std-ref">Checking the Overset Mesh</span></a> for how to visualize the iblank values). For example, cells inside a wing or strut should be flooded or blanked.</p></li>
+</ol>
+</div>
+<div class="section" id="structural-optimization">
+<h3>Structural optimization<a class="headerlink" href="#structural-optimization" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>Check that the boundary conditions and loads have been applied correctly.</p></li>
+<li><p>Check that the design variables and properties have been added to the correct components.</p></li>
+<li><p>Check that the <code class="docutils literal notranslate"><span class="pre">Loadfactor</span></code> and <code class="docutils literal notranslate"><span class="pre">SafetyFactor</span></code> have beed defined correctly.</p></li>
+</ol>
+</div>
+<div class="section" id="aerostructural-optimization">
+<h3>Aerostructural optimization<a class="headerlink" href="#aerostructural-optimization" title="Permalink to this headline"></a></h3>
+<ol class="arabic simple">
+<li><p>Check your rigid links as mentioned in <a class="reference internal" href="aerostruct_overview.html#aerostruct-overview"><span class="std std-ref">Aerostructural Analysis</span></a>.</p></li>
+<li><p>Check derivatives with single disciplines first (i.e., aero and structural respectively), and then check derivatives with coupled aerostructural solutions. Finite differencing might suffice, but it’s always better to confirm with the complex-step method.</p></li>
+<li><p>Check derivatives with as many design variables as you can.</p></li>
+<li><p>When debugging, it might be helpful to turn on the <code class="docutils literal notranslate"><span class="pre">coldstartMDA</span></code> option.</p></li>
+<li><p>Check that the MDA converges tightly enough.</p></li>
+<li><p>Check that the coupled adjoints converge tightly enough.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="if-things-failed-troubleshooting">
+<h2>If things failed (troubleshooting)<a class="headerlink" href="#if-things-failed-troubleshooting" title="Permalink to this headline"></a></h2>
+<ul>
+<li><p><strong>If you have a jagged, wavy pressure distribution:</strong> low-speed cases generally require smoother meshes compared to typical high-speed cases (&gt; M 0.3), as they are sensitive to perturbations. A mesh that gives a smooth pressure distribution at typical flight Mach numbers might not be acceptable for low-speed conditions. Here are some tips on how to improve these kinds of issues:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>Check if you have a fine enough spacing for the airfoil coordinates used to generate the wing surface (assuming you generated the surface with airfoil coordinates).</p>
+<blockquote>
+<div><p>To refine the point distribution of your airfoil coordinates, you can use <code class="docutils literal notranslate"><span class="pre">pySpline</span></code>.
+An example script is shown below.
+The arguments of <code class="xref py py-class docutils literal notranslate"><span class="pre">pySpline.Curve()</span></code> can be used to change the order and number of control points of the spline-fit for the original coordinates, and the <code class="xref py py-meth docutils literal notranslate"><span class="pre">getValue</span></code> method used to output more coordinates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyspline</span> <span class="kn">import</span> <span class="n">pySpline</span>
+
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="s1">&#39;NACA642A015.dat&#39;</span><span class="p">,</span><span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">curve</span> <span class="o">=</span> <span class="n">pySpline</span><span class="o">.</span><span class="n">Curve</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span><span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">Nctl</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span><span class="n">niter</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">curve</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1000</span><span class="p">))</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">pySpline</span><span class="o">.</span><span class="n">openTecplot</span><span class="p">(</span><span class="s1">&#39;naca_data_more.dat&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">pySpline</span><span class="o">.</span><span class="n">writeTecplot1D</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;interpolated&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Check if you have a small enough <code class="docutils literal notranslate"><span class="pre">Triangulation</span> <span class="pre">Tolerance</span></code> in ICEM (<code class="docutils literal notranslate"><span class="pre">Settings</span> <span class="pre">-&gt;</span> <span class="pre">Model/Units</span></code>) when you generate a surface mesh (recommended value: 1e-8). ICEM triangulates B-spline surfaces and curves when it reads Tetin files. <code class="docutils literal notranslate"><span class="pre">Triangulation</span> <span class="pre">Tolerance</span></code> is the distance allowed between the triangle edge and the actual surface edges. A smaller tolerance gives a better representation of the surface. For more details please see the ICEM manual.</p></li>
+<li><p>Check if you have a smooth spacing transition between adjacent blocks when generating the surface mesh in ICEM.</p></li>
+<li><p>Below are some pictures demonstrating this issue (the wing shown in the overset tutorial):</p>
+<blockquote>
+<div><ul>
+<li><p>The initial mesh at Mach 0.15:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/checklist_badinitial.png"><img alt="_images/checklist_badinitial.png" src="_images/checklist_badinitial.png" style="width: 320.6px; height: 284.6px;" /></a>
+</div></blockquote>
+</li>
+<li><p>The initial mesh at Mach 0.3:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/checklist_higherMACH.png"><img alt="_images/checklist_higherMACH.png" src="_images/checklist_higherMACH.png" style="width: 324.6px; height: 288.40000000000003px;" /></a>
+</div></blockquote>
+</li>
+<li><p>After improving the <code class="docutils literal notranslate"><span class="pre">Triangulation</span> <span class="pre">Tolerance</span></code> (Mach 0.15):</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/checklist_triangulation.png"><img alt="_images/checklist_triangulation.png" src="_images/checklist_triangulation.png" style="width: 325.0px; height: 287.8px;" /></a>
+</div></blockquote>
+</li>
+<li><p>After using pySpline to refine the section geometry (Mach 0.15):</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/checklist_pyspline.png"><img alt="_images/checklist_pyspline.png" src="_images/checklist_pyspline.png" style="width: 324.8px; height: 289.6px;" /></a>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ol>
+</div></blockquote>
+</li>
+<li><p><strong>If the feasibility does not seem to decrease:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Check if your adjoint solution converges fine.</p></li>
+<li><p>If you use KS constraints or heaviside functions in any of your constraints, try to decrease the KS weight or the sharpness parameter.</p></li>
+<li><p>Your gradients could be wrong if you haven’t checked them thoroughly.</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p><strong>Symptoms of negative volumes during optimization:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>The ADflow output will indicate that there was a failure.</p></li>
+<li><p>ADflow saved a <code class="docutils literal notranslate"><span class="pre">failed_mesh.cgns</span></code> file.</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><dl class="simple">
+<dt><strong>If you have negative volumes and want to identify where the negative cell volumes are</strong></dt><dd><ol class="arabic simple" id="negative-volumes">
+<li><p>Load the <code class="docutils literal notranslate"><span class="pre">failed_mesh.cgns</span></code> in Tecplot;</p></li>
+<li><p>Turn on <code class="docutils literal notranslate"><span class="pre">Mesh</span></code> in <code class="docutils literal notranslate"><span class="pre">show</span> <span class="pre">zone</span> <span class="pre">layers</span></code>, and switch on all zones that you want to show in <code class="docutils literal notranslate"><span class="pre">Mesh</span> <span class="pre">-&gt;</span> <span class="pre">Show</span> <span class="pre">Zone</span></code> and <code class="docutils literal notranslate"><span class="pre">Mesh</span> <span class="pre">-&gt;</span> <span class="pre">Show</span> <span class="pre">Mesh</span></code>;</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">Zone</span> <span class="pre">Style</span> <span class="pre">-&gt;</span> <span class="pre">Surfaces</span> <span class="pre">-&gt;</span> <span class="pre">Surfaces</span> <span class="pre">to</span> <span class="pre">Plot</span></code>, choose <code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">surfaces</span></code>;</p></li>
+<li><p>From <code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">-&gt;</span> <span class="pre">Calculate</span> <span class="pre">Variables</span></code>, choose <code class="docutils literal notranslate"><span class="pre">Cell</span> <span class="pre">Volume</span></code>;</p></li>
+<li><p>From <code class="docutils literal notranslate"><span class="pre">Plot</span> <span class="pre">-&gt;</span> <span class="pre">Blanking</span></code>, choose <code class="docutils literal notranslate"><span class="pre">Value</span> <span class="pre">Blanking</span></code>, switch on <code class="docutils literal notranslate"><span class="pre">include</span> <span class="pre">value</span> <span class="pre">blanking</span></code> and <code class="docutils literal notranslate"><span class="pre">active</span></code>, choose blank entire cells when <code class="docutils literal notranslate"><span class="pre">primary</span> <span class="pre">value</span> <span class="pre">is</span> <span class="pre">blank</span></code>, and choose blank cells when <code class="docutils literal notranslate"><span class="pre">Cell</span> <span class="pre">Volume</span> <span class="pre">is</span> <span class="pre">greater</span> <span class="pre">than</span> <span class="pre">0</span></code>;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ctrl+E</span></code> or <code class="docutils literal notranslate"><span class="pre">View</span> <span class="pre">-&gt;</span> <span class="pre">Fit</span> <span class="pre">Everything</span></code> to zoom in to the region where you have the negative cell volumes.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p><strong>If your CFD does not converge well:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Check the <span class="xref std std-ref">ADflow options</span> and <span class="xref std std-ref">ANK options</span> to see how you can change parameters to make the convergence better.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>If the MDA does not converge well:</strong></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Try different values for <code class="docutils literal notranslate"><span class="pre">damp0</span></code> that is used in <code class="docutils literal notranslate"><span class="pre">aitkenAccelaration</span></code>.</p></li>
+<li><p>Try different values for <code class="docutils literal notranslate"><span class="pre">dampUB</span></code> and <code class="docutils literal notranslate"><span class="pre">dampLB</span></code> (<code class="docutils literal notranslate"><span class="pre">dampUB</span></code> is currently not an option. You might need to manually specify it in pyTACS. This will be updated to be an option soon.) In particular, try increasing <code class="docutils literal notranslate"><span class="pre">dampUB</span></code> if your MDA updates extremely slowly at later stages.</p></li>
+<li><p>Try with <code class="docutils literal notranslate"><span class="pre">MDSolver:</span> <span class="pre">'NK'</span></code>. There are different options for <code class="docutils literal notranslate"><span class="pre">NK</span></code>, for example, <code class="docutils literal notranslate"><span class="pre">newtonls</span></code> and <code class="docutils literal notranslate"><span class="pre">newtontr</span></code>. More options can be found in the PETSc manual. You can change it by setting <code class="docutils literal notranslate"><span class="pre">nktype':'newtonls</span></code>. (TODO: CNK solver currently does not work properly. Will update once it’s done.)</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p><strong>If your coupled adjoints do not converge well:</strong></p>
+<blockquote>
+<div><ol class="arabic">
+<li><p>If you are using <code class="docutils literal notranslate"><span class="pre">KSP</span></code> as the adjoint solver and it stalls:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Try increasing <code class="docutils literal notranslate"><span class="pre">MDSubSpaceSize</span></code>;</p></li>
+<li><p>Try using <code class="docutils literal notranslate"><span class="pre">adjointSolver:</span> <span class="pre">GS</span></code> (this is robust but EXTREMELY slow).</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Try using a tighter tolerance for the MDA to see if that helps.</p></li>
+</ol>
+</div></blockquote>
+</li>
+<li><p><strong>If your adjoint solutions stall when using an overset mesh:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Some adjoint stalls might be inevitable for now. It’s known that with some recent fixes to the zipper mesh code, some adjoint solutions may stall. There’s no solid solution at the moment. You can play with the adjoint parameters. However, it’s very likely that the adjoints can still converge to an acceptable level. Set <code class="docutils literal notranslate"><span class="pre">skipafterfailedadjoints</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>, so that you can still compute sensitivities even thought the adjoints do not converge to the desired tolerance.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overset_opt.html" class="btn btn-neutral float-left" title="Optimization with ADflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

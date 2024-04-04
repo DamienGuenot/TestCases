@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optimization with ADflow &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pre-run checklists and troubleshooting" href="opt_check_list.html" />
+    <link rel="prev" title="Creating FFD Grids" href="overset_ffds.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overset_geom.html">Geometry and Surface Mesh Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_volume_meshes.html">Volume Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ihcc.html">Checking the Overset Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_analysis.html">Analysis with ADflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ffds.html">Creating FFD Grids</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Optimization with ADflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a> &raquo;</li>
+      <li>Optimization with ADflow</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overset_opt.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="optimization-with-adflow">
+<span id="overset-opt"></span><h1>Optimization with ADflow<a class="headerlink" href="#optimization-with-adflow" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>Here, we will set up a twist and shape optimization case for both wings with ADflow.</p>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>Navigate to the directory <code class="docutils literal notranslate"><span class="pre">oversetopt/opt</span></code> in your tutorial folder.
+Copy the following files from the volume meshing directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cp ../mesh/volume/overset_combined.cgns .
+</pre></div>
+</div>
+<p>Copy the following files from the FFDs directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cp ../ffd/ffd_front_wing.xyz .
+$ cp ../ffd/ffd_back_wing.xyz .
+$ cp ../ffd/ffd_parent.xyz .
+</pre></div>
+</div>
+<p>Create the following empty runscript in the current directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">aero_opt_tandem.py</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="dissecting-the-adflow-runscript">
+<h2>Dissecting the ADflow runscript<a class="headerlink" href="#dissecting-the-adflow-runscript" title="Permalink to this headline"></a></h2>
+<p>Open the file <code class="docutils literal notranslate"><span class="pre">aero_opt_tandem.py</span></code> with your favorite text editor.
+Then copy the following code blocks into this file.</p>
+<p>First, as usual we have the initial imports and options.
+All these options should be familiar at this point.
+You may notice that we haven’t specified any overset options here.
+This is because the default values for the overset options work fine for this case.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">mpi4py</span> <span class="kn">import</span> <span class="n">MPI</span>
+<span class="kn">from</span> <span class="nn">baseclasses</span> <span class="kn">import</span> <span class="n">AeroProblem</span>
+<span class="kn">from</span> <span class="nn">adflow</span> <span class="kn">import</span> <span class="n">ADFLOW</span>
+<span class="kn">from</span> <span class="nn">pygeo</span> <span class="kn">import</span> <span class="n">DVGeometry</span><span class="p">,</span> <span class="n">DVConstraints</span>
+<span class="kn">from</span> <span class="nn">pyoptsparse</span> <span class="kn">import</span> <span class="n">Optimization</span><span class="p">,</span> <span class="n">OPT</span>
+<span class="kn">from</span> <span class="nn">idwarp</span> <span class="kn">import</span> <span class="n">USMesh</span>
+<span class="kn">from</span> <span class="nn">multipoint</span> <span class="kn">import</span> <span class="n">multiPointSparse</span>
+
+<span class="n">MP</span> <span class="o">=</span> <span class="n">multiPointSparse</span><span class="p">(</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="p">)</span>
+<span class="n">MP</span><span class="o">.</span><span class="n">addProcessorSet</span><span class="p">(</span><span class="s2">&quot;cruise&quot;</span><span class="p">,</span> <span class="n">nMembers</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">memberSizes</span><span class="o">=</span><span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+<span class="n">comm</span><span class="p">,</span> <span class="n">setComm</span><span class="p">,</span> <span class="n">setFlags</span><span class="p">,</span> <span class="n">groupFlags</span><span class="p">,</span> <span class="n">ptID</span> <span class="o">=</span> <span class="n">MP</span><span class="o">.</span><span class="n">createCommunicators</span><span class="p">()</span>
+
+<span class="n">gridFile</span> <span class="o">=</span> <span class="s2">&quot;overset_combined.cgns&quot;</span>
+<span class="n">aeroOptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># I/O Parameters</span>
+    <span class="s2">&quot;gridFile&quot;</span><span class="p">:</span> <span class="n">gridFile</span><span class="p">,</span>
+    <span class="s2">&quot;outputDirectory&quot;</span><span class="p">:</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;monitorvariables&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;resrho&quot;</span><span class="p">,</span> <span class="s2">&quot;cl&quot;</span><span class="p">,</span> <span class="s2">&quot;cd&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;resturb&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;writeTecplotSurfaceSolution&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># Physics Parameters</span>
+    <span class="s2">&quot;equationType&quot;</span><span class="p">:</span> <span class="s2">&quot;RANS&quot;</span><span class="p">,</span>
+    <span class="c1"># Solver Parameters</span>
+    <span class="s2">&quot;MGCycle&quot;</span><span class="p">:</span> <span class="s2">&quot;sg&quot;</span><span class="p">,</span>
+    <span class="c1"># ANK Solver Parameters</span>
+    <span class="s2">&quot;useANKSolver&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;ankswitchtol&quot;</span><span class="p">:</span> <span class="mf">1e5</span><span class="p">,</span>
+    <span class="s2">&quot;anksecondordswitchtol&quot;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span>
+    <span class="s2">&quot;ankcoupledswitchtol&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+    <span class="c1"># NK Solver Parameters</span>
+    <span class="s2">&quot;useNKSolver&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;nkswitchtol&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+    <span class="c1"># Termination Criteria</span>
+    <span class="s2">&quot;L2Convergence&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+    <span class="s2">&quot;L2ConvergenceCoarse&quot;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span>
+    <span class="s2">&quot;nCycles&quot;</span><span class="p">:</span> <span class="mi">10000</span><span class="p">,</span>
+    <span class="c1"># Adjoint Parameters</span>
+    <span class="s2">&quot;adjointL2Convergence&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Create solver</span>
+<span class="n">CFDSolver</span> <span class="o">=</span> <span class="n">ADFLOW</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">aeroOptions</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+<span class="c1"># Save the lift distribution for the front wing</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">addLiftDistribution</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">groupName</span><span class="o">=</span><span class="s2">&quot;wing_front&quot;</span><span class="p">)</span>
+<span class="c1"># Save the lift distribution for the back wing</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">addLiftDistribution</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">groupName</span><span class="o">=</span><span class="s2">&quot;wing_back&quot;</span><span class="p">)</span>
+<span class="c1"># Save the total lift distribution</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">addLiftDistribution</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">)</span>
+
+<span class="n">ap</span> <span class="o">=</span> <span class="n">AeroProblem</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fc&quot;</span><span class="p">,</span> <span class="n">mach</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">altitude</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">areaRef</span><span class="o">=</span><span class="mf">0.64</span> <span class="o">*</span> <span class="mf">0.24</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">6.0</span><span class="p">,</span> <span class="n">chordRef</span><span class="o">=</span><span class="mf">0.24</span><span class="p">,</span> <span class="n">evalFuncs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cl&quot;</span><span class="p">,</span> <span class="s2">&quot;cd&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Next, we instantiate DVGeometry objects.
+For the front and back wings, we specify their FFD grid-file names and also specify that they are <code class="docutils literal notranslate"><span class="pre">child</span></code> FFDs.
+For the parent FFD, we use <code class="xref py py-meth docutils literal notranslate"><span class="pre">DVGeo.addChild()</span></code> to provide the front and back wing DVGeometry objects as child FFDs.
+As mentioned earlier, this parent-child approach is used because ADflow only accepts one DVGeometry object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Create DVGeometry object for front wing</span>
+<span class="n">FFDFile_front</span> <span class="o">=</span> <span class="s2">&quot;ffd_front_wing.xyz&quot;</span>
+<span class="n">DVGeo_front</span> <span class="o">=</span> <span class="n">DVGeometry</span><span class="p">(</span><span class="n">FFDFile_front</span><span class="p">,</span> <span class="n">child</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Create reference axis for the front wing</span>
+<span class="n">nRefAxPts_front</span> <span class="o">=</span> <span class="n">DVGeo_front</span><span class="o">.</span><span class="n">addRefAxis</span><span class="p">(</span><span class="s2">&quot;wing_front&quot;</span><span class="p">,</span> <span class="n">xFraction</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">alignIndex</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">nTwist_front</span> <span class="o">=</span> <span class="n">nRefAxPts_front</span>
+
+<span class="c1"># Create DVGeometry object for back wing</span>
+<span class="n">FFDFile_back</span> <span class="o">=</span> <span class="s2">&quot;ffd_back_wing.xyz&quot;</span>
+<span class="n">DVGeo_back</span> <span class="o">=</span> <span class="n">DVGeometry</span><span class="p">(</span><span class="n">FFDFile_back</span><span class="p">,</span> <span class="n">child</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Create reference axis for the back wing</span>
+<span class="n">nRefAxPts_back</span> <span class="o">=</span> <span class="n">DVGeo_back</span><span class="o">.</span><span class="n">addRefAxis</span><span class="p">(</span><span class="s2">&quot;wing_back&quot;</span><span class="p">,</span> <span class="n">xFraction</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">alignIndex</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">nTwist_back</span> <span class="o">=</span> <span class="n">nRefAxPts_back</span>
+
+<span class="c1"># Set up parent DVGeometry object</span>
+<span class="n">FFDFile_PARENT</span> <span class="o">=</span> <span class="s2">&quot;ffd_parent.xyz&quot;</span>
+<span class="n">DVGeo_PARENT</span> <span class="o">=</span> <span class="n">DVGeometry</span><span class="p">(</span><span class="n">FFDFile_PARENT</span><span class="p">)</span>
+<span class="n">DVGeo_PARENT</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">DVGeo_front</span><span class="p">)</span>
+<span class="n">DVGeo_PARENT</span><span class="o">.</span><span class="n">addChild</span><span class="p">(</span><span class="n">DVGeo_back</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Now we create functions for the twist design variables for the front and back wings, and set up the design variables for twist and shape.
+After that we only need to use <code class="xref py py-meth docutils literal notranslate"><span class="pre">CFDSolver.setDVGeo()</span></code> to add the parent DVGeometry object.
+Unlike the <span class="xref std std-ref">Aerodynamic Optimization</span> tutorial, for this tandem-wing case, we allow the optimizer to twist the roots as well and do not use an angle-of-attack design variable (which changes the freestream-flow angle).
+This allows effectively changing the angles of attack of the two wings independently.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Set up global design variables</span>
+
+<span class="c1"># We will allow the optimizer to twist the root as well</span>
+<span class="k">def</span> <span class="nf">twist_front</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">geo</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nRefAxPts_front</span><span class="p">):</span>
+        <span class="n">geo</span><span class="o">.</span><span class="n">rot_z</span><span class="p">[</span><span class="s2">&quot;wing_front&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+
+<span class="c1"># We will allow the optimizer to twist the root as well</span>
+<span class="k">def</span> <span class="nf">twist_back</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">geo</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nRefAxPts_back</span><span class="p">):</span>
+        <span class="n">geo</span><span class="o">.</span><span class="n">rot_z</span><span class="p">[</span><span class="s2">&quot;wing_back&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coef</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+
+<span class="n">DVGeo_front</span><span class="o">.</span><span class="n">addGeoDVGlobal</span><span class="p">(</span>
+    <span class="n">dvName</span><span class="o">=</span><span class="s2">&quot;twist_front&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nTwist_front</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">twist_front</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="p">)</span>
+
+<span class="n">DVGeo_back</span><span class="o">.</span><span class="n">addGeoDVGlobal</span><span class="p">(</span><span class="n">dvName</span><span class="o">=</span><span class="s2">&quot;twist_back&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nTwist_back</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">twist_back</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mi">5</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Set up local design variables</span>
+<span class="n">DVGeo_front</span><span class="o">.</span><span class="n">addGeoDVLocal</span><span class="p">(</span><span class="s2">&quot;local_front&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">DVGeo_back</span><span class="o">.</span><span class="n">addGeoDVLocal</span><span class="p">(</span><span class="s2">&quot;local_back&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Add DVGeo object to CFD solver</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">setDVGeo</span><span class="p">(</span><span class="n">DVGeo_PARENT</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Now we can set up the constraints.
+For the DVConstraints object, we only need to set the parent DVGeometry object using <code class="xref py py-meth docutils literal notranslate"><span class="pre">DVCon.setDVGeo()</span></code>.
+Then we add volume and thickness constraints.
+We require separate constraints for the front and back wings.
+Most of this should be familiar from the <span class="xref std std-ref">Aerodynamic Optimization</span> tutorial.
+When adding the leading and trailing edge constraints using <code class="xref py py-meth docutils literal notranslate"><span class="pre">addLeTeConstraints()</span></code>, we use <code class="docutils literal notranslate"><span class="pre">childIdx</span></code> to specify which child geometry the constraints apply to (<code class="docutils literal notranslate"><span class="pre">childIdx=0</span></code> would mean the first geometry that was added).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="n">DVCon</span> <span class="o">=</span> <span class="n">DVConstraints</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;con&quot;</span><span class="p">)</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">setDVGeo</span><span class="p">(</span><span class="n">DVGeo_PARENT</span><span class="p">)</span>
+
+<span class="c1"># Only ADflow has the getTriangulatedSurface Function</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">setSurface</span><span class="p">(</span><span class="n">CFDSolver</span><span class="o">.</span><span class="n">getTriangulatedMeshSurface</span><span class="p">())</span>
+
+<span class="c1"># Volume constraints</span>
+<span class="c1"># For the front wing</span>
+<span class="n">leList_front</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.639</span><span class="p">]]</span>
+<span class="n">teList_front</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.239</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.239</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.639</span><span class="p">]]</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addVolumeConstraint</span><span class="p">(</span><span class="n">leList_front</span><span class="p">,</span> <span class="n">teList_front</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># For the back wing</span>
+<span class="n">delta_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">delta_y</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="n">leList_back</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.01</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.01</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.639</span><span class="p">]]</span>
+<span class="n">teList_back</span> <span class="o">=</span> <span class="p">[[</span><span class="mf">0.239</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.239</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.639</span><span class="p">]]</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addVolumeConstraint</span><span class="p">(</span><span class="n">leList_back</span><span class="p">,</span> <span class="n">teList_back</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Thickness constraints</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addThicknessConstraints2D</span><span class="p">(</span><span class="n">leList_front</span><span class="p">,</span> <span class="n">teList_front</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addThicknessConstraints2D</span><span class="p">(</span><span class="n">leList_back</span><span class="p">,</span> <span class="n">teList_back</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Le/Te constraints</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addLeTeConstraints</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;iLow&quot;</span><span class="p">,</span> <span class="n">childIdx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addLeTeConstraints</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;iHigh&quot;</span><span class="p">,</span> <span class="n">childIdx</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addLeTeConstraints</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;iLow&quot;</span><span class="p">,</span> <span class="n">childIdx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addLeTeConstraints</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;iHigh&quot;</span><span class="p">,</span> <span class="n">childIdx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">DVCon</span><span class="o">.</span><span class="n">writeTecplot</span><span class="p">(</span><span class="s2">&quot;constraints.dat&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Finally we have our functions of interest and optimization settings.
+We only use <code class="xref py py-meth docutils literal notranslate"><span class="pre">addVariablesPyOpt()</span></code> for the parent FFD.
+The rest should look familiar.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="n">meshOptions</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gridFile&quot;</span><span class="p">:</span> <span class="n">gridFile</span><span class="p">}</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">USMesh</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">meshOptions</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">setMesh</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">cruiseFuncs</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="c1"># Set design vars</span>
+    <span class="n">DVGeo_PARENT</span><span class="o">.</span><span class="n">setDesignVars</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">ap</span><span class="o">.</span><span class="n">setDesignVars</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="c1"># Run CFD</span>
+    <span class="n">CFDSolver</span><span class="p">(</span><span class="n">ap</span><span class="p">)</span>
+    <span class="c1"># Evaluate functions</span>
+    <span class="n">funcs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">DVCon</span><span class="o">.</span><span class="n">evalFunctions</span><span class="p">(</span><span class="n">funcs</span><span class="p">)</span>
+
+    <span class="n">CFDSolver</span><span class="o">.</span><span class="n">evalFunctions</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">funcs</span><span class="p">)</span>
+    <span class="n">CFDSolver</span><span class="o">.</span><span class="n">checkSolutionFailure</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">funcs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">funcs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">funcs</span>
+
+
+<span class="k">def</span> <span class="nf">cruiseFuncsSens</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">funcs</span><span class="p">):</span>
+    <span class="n">funcsSens</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">DVCon</span><span class="o">.</span><span class="n">evalFunctionsSens</span><span class="p">(</span><span class="n">funcsSens</span><span class="p">)</span>
+
+    <span class="n">CFDSolver</span><span class="o">.</span><span class="n">evalFunctionsSens</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">funcsSens</span><span class="p">)</span>
+    <span class="n">CFDSolver</span><span class="o">.</span><span class="n">checkAdjointFailure</span><span class="p">(</span><span class="n">ap</span><span class="p">,</span> <span class="n">funcsSens</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">funcsSens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">funcsSens</span>
+
+
+<span class="k">def</span> <span class="nf">objCon</span><span class="p">(</span><span class="n">funcs</span><span class="p">,</span> <span class="n">printOK</span><span class="p">):</span>
+    <span class="c1"># Assemble the objective and any additional constraints:</span>
+    <span class="n">funcs</span><span class="p">[</span><span class="s2">&quot;obj&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">funcs</span><span class="p">[</span><span class="n">ap</span><span class="p">[</span><span class="s2">&quot;cd&quot;</span><span class="p">]]</span>
+    <span class="n">funcs</span><span class="p">[</span><span class="s2">&quot;cl_con_&quot;</span> <span class="o">+</span> <span class="n">ap</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">funcs</span><span class="p">[</span><span class="n">ap</span><span class="p">[</span><span class="s2">&quot;cl&quot;</span><span class="p">]]</span> <span class="o">-</span> <span class="mf">0.5</span>
+    <span class="k">if</span> <span class="n">printOK</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;funcs in obj:&quot;</span><span class="p">,</span> <span class="n">funcs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">funcs</span>
+
+
+<span class="c1"># Create optimization problem</span>
+<span class="n">optProb</span> <span class="o">=</span> <span class="n">Optimization</span><span class="p">(</span><span class="s2">&quot;opt&quot;</span><span class="p">,</span> <span class="n">MP</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">comm</span><span class="o">=</span><span class="n">comm</span><span class="p">)</span>
+
+<span class="c1"># Add objective</span>
+<span class="n">optProb</span><span class="o">.</span><span class="n">addObj</span><span class="p">(</span><span class="s2">&quot;obj&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Add variables from the AeroProblem</span>
+<span class="n">ap</span><span class="o">.</span><span class="n">addVariablesPyOpt</span><span class="p">(</span><span class="n">optProb</span><span class="p">)</span>
+
+<span class="c1"># Add DVGeo variables</span>
+<span class="n">DVGeo_PARENT</span><span class="o">.</span><span class="n">addVariablesPyOpt</span><span class="p">(</span><span class="n">optProb</span><span class="p">)</span>
+
+<span class="c1"># Add constraints</span>
+<span class="n">DVCon</span><span class="o">.</span><span class="n">addConstraintsPyOpt</span><span class="p">(</span><span class="n">optProb</span><span class="p">)</span>
+
+<span class="n">optProb</span><span class="o">.</span><span class="n">addCon</span><span class="p">(</span><span class="s2">&quot;cl_con_&quot;</span> <span class="o">+</span> <span class="n">ap</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+
+<span class="c1"># The MP object needs the &#39;obj&#39; and &#39;sens&#39; function for each proc set,</span>
+<span class="c1"># the optimization problem and what the objcon function is:</span>
+<span class="n">MP</span><span class="o">.</span><span class="n">setProcSetObjFunc</span><span class="p">(</span><span class="s2">&quot;cruise&quot;</span><span class="p">,</span> <span class="n">cruiseFuncs</span><span class="p">)</span>
+<span class="n">MP</span><span class="o">.</span><span class="n">setProcSetSensFunc</span><span class="p">(</span><span class="s2">&quot;cruise&quot;</span><span class="p">,</span> <span class="n">cruiseFuncsSens</span><span class="p">)</span>
+<span class="n">MP</span><span class="o">.</span><span class="n">setObjCon</span><span class="p">(</span><span class="n">objCon</span><span class="p">)</span>
+<span class="n">MP</span><span class="o">.</span><span class="n">setOptProb</span><span class="p">(</span><span class="n">optProb</span><span class="p">)</span>
+<span class="n">optProb</span><span class="o">.</span><span class="n">printSparsity</span><span class="p">()</span>
+
+<span class="c1"># Set up optimizer</span>
+<span class="n">optOptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Major feasibility tolerance&quot;</span><span class="p">:</span> <span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="s2">&quot;Major optimality tolerance&quot;</span><span class="p">:</span> <span class="mf">1.0e-4</span><span class="p">,</span>
+    <span class="s2">&quot;Major iterations limit&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="s2">&quot;Difference interval&quot;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="s2">&quot;Hessian full memory&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;Function precision&quot;</span><span class="p">:</span> <span class="mf">1.0e-8</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">opt</span> <span class="o">=</span> <span class="n">OPT</span><span class="p">(</span><span class="s2">&quot;snopt&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">optOptions</span><span class="p">)</span>
+
+<span class="c1"># Run Optimization</span>
+<span class="n">sol</span> <span class="o">=</span> <span class="n">opt</span><span class="p">(</span><span class="n">optProb</span><span class="p">,</span> <span class="n">MP</span><span class="o">.</span><span class="n">sens</span><span class="p">,</span> <span class="n">storeHistory</span><span class="o">=</span><span class="s2">&quot;opt.hst&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">comm</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<p>Run the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpirun -np 4 python aero_opt_tandem.py
+</pre></div>
+</div>
+<p>This will take around 4–5 hrs to run on a 4 core desktop computer for the meshes used in this tutorial.
+But after a few iterations you can use the saved CGNS solution files and Tecplot to see how the geometry is being changed by the optimizer.</p>
+<p>The final optimized lift distributions for this problem will look like the following:</p>
+<a class="reference internal image-reference" href="_images/overset_opt_lift_dist.png"><img alt="_images/overset_opt_lift_dist.png" src="_images/overset_opt_lift_dist.png" style="width: 549.6px; height: 505.6px;" /></a>
+<p>And the wings will look like this:</p>
+<a class="reference internal image-reference" href="_images/overset_opt_cps.png"><img alt="_images/overset_opt_cps.png" src="_images/overset_opt_cps.png" style="width: 520.0px; height: 462.40000000000003px;" /></a>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overset_ffds.html" class="btn btn-neutral float-left" title="Creating FFD Grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="opt_check_list.html" class="btn btn-neutral float-right" title="Pre-run checklists and troubleshooting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aerostructural analysis with ADflow and TACS &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Structural and Aerostructural Optimization" href="opt_overview.html" />
+    <link rel="prev" title="Structural analysis with TACS" href="struct_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Aerostructural analysis with ADflow and TACS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/aerostruct_analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="aerostructural-analysis-with-adflow-and-tacs">
+<span id="aerostruct-analysis"></span><h1>Aerostructural analysis with ADflow and TACS<a class="headerlink" href="#aerostructural-analysis-with-adflow-and-tacs" title="Permalink to this headline"></a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>This tutorial introduces the setup for a basic aerostructural analysis.
+The aerostructural analysis scripts in MACH use both the aerodynamics and structures modules.
+Therefore, it is assumed that you have completed both the aerodynamics and structures single discipline tutorials prior to completing this multidisciplinary tutorial.
+The wing model we are using, and the related <code class="docutils literal notranslate"><span class="pre">.cgns</span></code> and <code class="docutils literal notranslate"><span class="pre">.bdf</span></code> meshes, refer to the geometry discussed in the <span class="xref std std-ref">MACH-Aero tutorial</span>.
+Note that the aerodynamic and structural analyses are stacked on the same processors.
+This is our current bast practice as it tends to make it easier to load balance the problem.
+Old scripts that use a “split” approach, pre-allocating the processors for aerodynamic and structural optimization separately, are considered outdated.</p>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>In this section we refer to <code class="docutils literal notranslate"><span class="pre">as_run.py</span></code> run file. It uses <code class="docutils literal notranslate"><span class="pre">wingbox.bdf</span></code> and <code class="docutils literal notranslate"><span class="pre">wing_vol.cgns</span></code> as input meshes, and the following setup files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_adflow</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_warp</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_tacs</span></code> which is re-used from the structural analysis and optimization sections.</p></li>
+</ul>
+</div>
+<div class="section" id="auxiliary-setup-files">
+<span id="aux-files"></span><h2>Auxiliary setup files<a class="headerlink" href="#auxiliary-setup-files" title="Permalink to this headline"></a></h2>
+<p>Following our coding best practice, we set up the solvers and additional modules in separate <code class="docutils literal notranslate"><span class="pre">setup_</span></code> files, stored in the <code class="docutils literal notranslate"><span class="pre">SETUP</span></code> folder.
+You should be familiar with these scripts from the previous sections of the tutorial, so we briefly discuss their content in the following sections.
+Copy the code in the related files in the <code class="docutils literal notranslate"><span class="pre">SETUP</span></code> folder.</p>
+<div class="section" id="setup-aerodynamics">
+<h3>Setup aerodynamics<a class="headerlink" href="#setup-aerodynamics" title="Permalink to this headline"></a></h3>
+<p>This script is very concise. It receives the grid file as input and returns an instance of the ADflow solver. If you want to change the solver options, edit the dictionary below according to <span class="xref std std-ref">ADflow documentation</span>.</p>
+</div>
+<div class="section" id="setup-mesh-warping">
+<h3>Setup mesh warping<a class="headerlink" href="#setup-mesh-warping" title="Permalink to this headline"></a></h3>
+<p>Another concise file receives the grid file as an input and returns an instance of IDWarp to be later associated with the <code class="docutils literal notranslate"><span class="pre">CFDSolver</span></code>.</p>
+<p>To add more specific options, check the <span class="xref std std-ref">IDWarp documentation</span></p>
+</div>
+</div>
+<div class="section" id="dissecting-the-aerostructural-runscript">
+<h2>Dissecting the aerostructural runscript<a class="headerlink" href="#dissecting-the-aerostructural-runscript" title="Permalink to this headline"></a></h2>
+<p>Open the file <code class="docutils literal notranslate"><span class="pre">as_run.py</span></code> with your favorite text editor.
+Then copy the code from each of the following sections into this file.</p>
+<div class="section" id="import-libraries-and-define-common-variables">
+<h3>Import libraries and define common variables<a class="headerlink" href="#import-libraries-and-define-common-variables" title="Permalink to this headline"></a></h3>
+<p>The imports for this runscript should be familiar if you have already run aerodynamic and structural analyses.
+The <cite>Problem</cite> classes from <code class="docutils literal notranslate"><span class="pre">baseclasses</span></code> instantiate objects that collect all the relevant input data for the single solvers, <code class="docutils literal notranslate"><span class="pre">ADflow</span></code>, <code class="docutils literal notranslate"><span class="pre">TACS</span></code>, and <code class="docutils literal notranslate"><span class="pre">pyAeroStrucuture</span></code> respectively.
+This last solver is imported explicitly here together with the load transfer class, while the other codes (and the mesh warping tool <code class="docutils literal notranslate"><span class="pre">IDwarp</span></code>) are imported separately in from their respective <a class="reference internal" href="#aux-files"><span class="std std-ref">Auxiliary setup files</span></a>.</p>
+<p>Note that the structural input file is called directly from <code class="docutils literal notranslate"><span class="pre">setup_tacs</span></code> for consistency with the previous tutorial, but it is good practice to store all the input files in a shared dictionary like the one above.
+Check <code class="docutils literal notranslate"><span class="pre">setup_adflow</span></code> to see how the info is passed to the setup scripts.</p>
+</div>
+<div class="section" id="setup-aerostructural-problem">
+<span id="as-prob-setup"></span><h3>Setup aerostructural problem<a class="headerlink" href="#setup-aerostructural-problem" title="Permalink to this headline"></a></h3>
+<p>We set up the aerodynamic and structural problems separately with the usual approach.
+The <code class="docutils literal notranslate"><span class="pre">AeroStructProblem()</span></code> class takes care of putting the two problems together and feed the info to the <code class="docutils literal notranslate"><span class="pre">pyAeroStructure</span></code> instance.</p>
+</div>
+<div class="section" id="setup-solvers">
+<h3>Setup solvers<a class="headerlink" href="#setup-solvers" title="Permalink to this headline"></a></h3>
+<p>Similarly, the solvers are instantiated separately (with their respective <code class="docutils literal notranslate"><span class="pre">setup_</span></code> files)</p>
+</div>
+<div class="section" id="setup-pyaerostructure">
+<span id="setup-assolver"></span><h3>Setup pyAeroStructure<a class="headerlink" href="#setup-pyaerostructure" title="Permalink to this headline"></a></h3>
+<p>In this section of the code, we set up the load transfer by instantiating a <code class="xref py py-class docutils literal notranslate"><span class="pre">TACSLDTransfer()</span></code> object with default options and the instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">AeroStruct()</span></code> taking as input the discipline solvers, the transfer object, and a set of options for the coupled aerostructural solver and sensitivities.</p>
+<p>Check <span class="xref std std-ref">pyAeroStructure options documentation</span> to learn more about the options provided via the <code class="docutils literal notranslate"><span class="pre">mdOptions</span></code> dictionary.
+This example uses mostly default values, except for reducing the number of maximum iterations for the adjoint solver (<code class="docutils literal notranslate"><span class="pre">nAdjointIter</span></code>) and the MDA loop (<code class="docutils literal notranslate"><span class="pre">nMDIter</span></code>).
+The solver’s tolerance is also relaxed with respect to the default values.</p>
+<p>More information about how the coupled aerostructural system is handled and solved can be found on the <span class="xref std std-ref">pyAeroStructure documentation page</span>.</p>
+</div>
+<div class="section" id="solve-the-aerostructural-system">
+<h3>Solve the aerostructural system<a class="headerlink" href="#solve-the-aerostructural-system" title="Permalink to this headline"></a></h3>
+<p>The aerostructural solve is triggered when we explicitly call the <code class="docutils literal notranslate"><span class="pre">AeroStruct</span></code> instance with <code class="docutils literal notranslate"><span class="pre">AS(asp)</span></code>.
+Note that only now we feed the solver with the problem case information defined at the top (<a class="reference internal" href="#as-prob-setup"><span class="std std-ref">Setup aerostructural problem</span></a>).
+Once the analysis is complete, we evaluate the functionals of interest, defined by the <code class="docutils literal notranslate"><span class="pre">evalFuncs</span></code> options in the Aero and Structural problems, calling the <code class="docutils literal notranslate"><span class="pre">.evalFunctions(asp,funcs)</span></code> method.
+This method takes the aerostructural problem instance and the empty <code class="docutils literal notranslate"><span class="pre">funcs</span></code> dictionary as input.</p>
+</div>
+<div class="section" id="compute-the-aerostructural-gradients">
+<h3>Compute the aerostructural gradients<a class="headerlink" href="#compute-the-aerostructural-gradients" title="Permalink to this headline"></a></h3>
+<p>Similarly to what done for the analysis, <code class="docutils literal notranslate"><span class="pre">.evalFunctionsSens()</span></code> now triggers the adjoint solver to compute the coupled sensitivities.</p>
+<p>Note that we are not defining any aerodynamic (eg. alpha) or shape design variables (we are not even using pyGeo) for this analysis.
+The only DVs are the structural parameters defined in the <span class="xref std std-ref">setup_tacs file</span>, and thus the sensitivities are calculated with respect to those variables.
+Although we only use structural variables, we still have to solve a coupled adjoint equation to take care of the <cite>off-diagonal</cite> terms of the system.
+Indeed, the effects of any structural change do not only affect the wingbox characteristics such as mass and stiffness, but propagate to the aerodynamic performance of the deflected wing.
+To learn more about how we implement the coupled aerostructural analysis and sensitivity, check <span class="xref std std-ref">pyAeroStructure documentation</span>.</p>
+</div>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<p>First make the output directory and then run the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir output
+$ mpirun -np 4 python as_run.py
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Always check the rigid links when you run your aerostructural analysis the first time,
+but no need to print out the rigid links for later production runs.
+To check, provide the <code class="docutils literal notranslate"><span class="pre">transferfileName</span></code> option to TACS.
+No need to add an extension.
+It will write out a file (.dat) for each processor, and you can open it in Tecplot.
+The file contains local rigid links (links between every aero node and the struct elements on that processor) and final rigid links selected based on minimum distance.
+Links should look reasonable and connect aero nodes and structural elements.
+An example of the rigid links from this tutorial is shown below.</p>
+<a class="reference internal image-reference" href="_images/transfer_links.png"><img alt="_images/transfer_links.png" src="_images/transfer_links.png" style="width: 614.4px; height: 546.3px;" /></a>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="struct_analysis.html" class="btn btn-neutral float-left" title="Structural analysis with TACS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="opt_overview.html" class="btn btn-neutral float-right" title="Structural and Aerostructural Optimization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

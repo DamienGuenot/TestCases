@@ -1,0 +1,43 @@
+11.0 n_subfaces 9 n_families 5
+WING
+ORFN
+SOLID
+DEFAULT_EDGE
+DEFAULT_VERTEX
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+# 6 composite curves
+surf.0e0 2  surf.0e0  surf.1e4 
+crv.02 1  crv.02 
+surf.1e7 1  surf.1e7 
+crv.01 1  crv.01 
+surf.0e3 1  surf.0e3 
+surf.0e2 2  surf.0e2  surf.1e6 
+# 20 edges
+surf.0e0
+crv.02
+<surface>
+surf.1e7
+surf.0e0
+crv.01
+<surface>
+<surface>
+<surface>
+surf.0e3
+surf.0e0
+<surface>
+<surface>
+surf.0e2
+<surface>
+<surface>
+crv.02
+crv.01
+surf.1e7
+surf.0e3

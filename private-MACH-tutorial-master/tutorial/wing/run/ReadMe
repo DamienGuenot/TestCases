@@ -1,0 +1,4 @@
+as_opt.py: aerostructure optimisation
+as_run.py: aerostructure run
+cl_solve.py: load cases
+struct_opt.py: structure optimisation

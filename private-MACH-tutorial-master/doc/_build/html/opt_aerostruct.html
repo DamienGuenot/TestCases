@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aerostructural Optimization &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Aerodynamic Analysis and Optimization with Overset Meshes" href="overset_overview.html" />
+    <link rel="prev" title="Structural Optimization" href="opt_struct.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="opt_struct.html">Structural Optimization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Aerostructural Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="opt_overview.html">Structural and Aerostructural Optimization</a> &raquo;</li>
+      <li>Aerostructural Optimization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/opt_aerostruct.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="aerostructural-optimization">
+<span id="opt-aerostruct"></span><h1>Aerostructural Optimization<a class="headerlink" href="#aerostructural-optimization" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>In this section we will walk through the aerostructural optimization runscript.
+This builds on the aerostructural analysis and structural optimization cases covered in the previous sections of this tutorial.
+Some of the auxiliary setup files will be reused to avoid duplicates in the main script.</p>
+<p>As a reference example we use a two-point wing aerostructural drag and mass minimization problem with respect to wing twist and structural element thicknesses, while subject to geometrical, lift, and structural failure constraints.
+Shape variables can also be included in the problem on user demand.
+The objective function is defined <a class="reference internal" href="#def-objcon"><span class="std std-ref">here</span></a> as the sum of the drag and twice the wing structural mass.
+Note that the drag is not scaled here, and its order of magnitude might differ from the mass one.
+This potentially reduces the optimization effectiveness and efficiency.
+Production runscripts should have a better problem formulation then the one presented here as an example.
+As defined later in the <a class="reference internal" href="#des-points"><span class="std std-ref">Defining the cruise and maneuver design points</span></a> code section, we define a single cruise point and a single maneuver design point, which contribute to the objective function and non-linear constraints respectively.
+For the case without shape variables, the optimization problem is as follows:</p>
+<div class="line-block">
+<div class="line"><em>minimize</em></div>
+<div class="line-block">
+<div class="line">composite objective <span class="math notranslate nohighlight">\(D + 2M\)</span></div>
+</div>
+<div class="line"><em>with respect to</em></div>
+<div class="line-block">
+<div class="line">2 angles of attack</div>
+<div class="line">7 section twists</div>
+<div class="line">108 panel thicknesses</div>
+</div>
+<div class="line"><em>subject to</em></div>
+<div class="line-block">
+<div class="line">cruise lift constraint <span class="math notranslate nohighlight">\(L_\text{cruise} - W_\text{ref} = 0\)</span></div>
+<div class="line">maneuver lift constraint <span class="math notranslate nohighlight">\(L_\text{man} - 2.5 W_\text{ref} = 0\)</span></div>
+<div class="line">stress constraints <span class="math notranslate nohighlight">\(\mathrm{KS}_i \le 1.0, i=0,1,2\)</span></div>
+</div>
+</div>
+<p>The corresponding problem sparsity is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                   <span class="n">twist</span> <span class="p">(</span><span class="mi">7</span><span class="p">)</span>   <span class="n">struct</span> <span class="p">(</span><span class="mi">108</span><span class="p">)</span>   <span class="n">alpha_cruise</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="n">alpha_maneuver</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                                 <span class="o">+------------------------------------------------------------------+</span>
+      <span class="n">struct_linear_con</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">170</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+    <span class="n">struct_linear_con_0</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">170</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+             <span class="n">cruise_lift_con</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>         <span class="n">X</span>        <span class="o">|</span>                    <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+           <span class="n">maneuver_lift_con</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+     <span class="n">maneuver_USkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+     <span class="n">maneuver_LSkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                 <span class="o">--------------------------------------------------------------------</span>
+<span class="n">maneuver_Spars_RibsKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                 <span class="o">+------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<p>For the case with shape, there are the following additions:</p>
+<div class="line-block">
+<div class="line"><em>with respect to</em></div>
+<div class="line-block">
+<div class="line">96 local shape variables</div>
+</div>
+<div class="line"><em>subject to</em></div>
+<div class="line-block">
+<div class="line">1 volume constraint</div>
+<div class="line">100 thickness constraints</div>
+<div class="line"><span class="math notranslate nohighlight">\(4\times2\times2=16\)</span> LETE constraints</div>
+</div>
+</div>
+<p>And the sparsity is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                        <span class="n">twist</span> <span class="p">(</span><span class="mi">7</span><span class="p">)</span>   <span class="n">local</span> <span class="p">(</span><span class="mi">96</span><span class="p">)</span>   <span class="n">struct</span> <span class="p">(</span><span class="mi">108</span><span class="p">)</span>   <span class="n">alpha_cruise</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="n">alpha_maneuver</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                                      <span class="o">+-------------------------------------------------------------------------------+</span>
+           <span class="n">struct_linear_con</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">170</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>            <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+       <span class="n">DVCon1_volume_constraint_0</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>              <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+ <span class="n">DVCon1_thickness_constraints_0</span> <span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>              <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+<span class="n">DVCon1_lete_constraint_0_local</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>              <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+<span class="n">DVCon1_lete_constraint_1_local</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>              <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+         <span class="n">struct_linear_con_0</span><span class="p">(</span><span class="n">L</span><span class="p">)</span> <span class="p">(</span><span class="mi">170</span><span class="p">)</span> <span class="o">|</span>           <span class="o">|</span>            <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+                  <span class="n">cruise_lift_con</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>         <span class="n">X</span>        <span class="o">|</span>                    <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+                <span class="n">maneuver_lift_con</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+          <span class="n">maneuver_USkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+          <span class="n">maneuver_LSkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                      <span class="o">---------------------------------------------------------------------------------</span>
+     <span class="n">maneuver_Spars_RibsKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>     <span class="n">X</span>     <span class="o">|</span>      <span class="n">X</span>     <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>                  <span class="o">|</span>          <span class="n">X</span>         <span class="o">|</span>
+                                      <span class="o">+-------------------------------------------------------------------------------+</span>
+</pre></div>
+</div>
+<div class="section" id="structural-pre-optimization">
+<h3>Structural Pre-optimization<a class="headerlink" href="#structural-pre-optimization" title="Permalink to this headline"></a></h3>
+<p>Before performing an aerostructural optimization, its often beneficial to perform a structural pre-optimization.
+Two types are often performed, a single structural optimization or a sequence of structural optimizations.
+In the former, a single structural optimization is performed with constant maneuver  loads.
+In the latter, several structural optimizations are run in a sequence where at the start of each structural optimization the maneuver loads are updated.
+This strategy requires only a handful of updates in order to converge, i.e., the last structural optimization returns immediately as the current design is already optimal.
+While in general it is not necessary to run a structural pre-optimization it may benefit the subsequent full aerostructural optimization in several ways:</p>
+<ol class="arabic simple">
+<li><p>The starting point, in terms of mass and stiffness, is closer to the aerostructural optimum.</p></li>
+<li><p>The structural constraints are more easily satisfied during the aerostructural optimization.</p></li>
+<li><p>Accelerate the optimization and reduce the possibility of optimizer exiting prematurely.</p></li>
+</ol>
+<p>The multi structural pre-optimizatation strategy is not demonstrated here.
+Rather, in the following example we assume you already completed the <a class="reference internal" href="opt_struct.html#opt-struct"><span class="std std-ref">Structural Optimization</span></a> section, so you can use the history file from that optimization case to “warm start” the following aerostructural optimization.
+This optimization history can be thought of as the first iteration in the sequence of optimization described above.
+While it may not yield feasible initial structural constraints it still offers a good preconditioning of the structure for the aerostructural optimization.</p>
+</div>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>The reference file for this section is <code class="docutils literal notranslate"><span class="pre">as_opt.py</span></code>, which uses both the <code class="docutils literal notranslate"><span class="pre">.cgns</span></code> and <code class="docutils literal notranslate"><span class="pre">.bdf</span></code> input files and the following setup scripts:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_dvgeo.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_dvcon.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_warp.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_adflow.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setup_tacs.py</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="auxiliary-setup-files">
+<h2>Auxiliary setup files<a class="headerlink" href="#auxiliary-setup-files" title="Permalink to this headline"></a></h2>
+<p>Here we report the auxiliary files to set up the geometry, the structural solver, and the constraints respectively.
+These files are stored in the <code class="docutils literal notranslate"><span class="pre">SETUP</span></code> folder you can create in your main script directory.</p>
+<div class="section" id="setup-geometry">
+<h3>Setup geometry<a class="headerlink" href="#setup-geometry" title="Permalink to this headline"></a></h3>
+<p>Copy the following lines in <code class="docutils literal notranslate"><span class="pre">setup_dvgeo.py</span></code>:</p>
+<p>This function instantiates the <code class="docutils literal notranslate"><span class="pre">pyGeo</span></code> object, defines the twist variable and, if required by the user, adds the local shape variables to the problem</p>
+</div>
+<div class="section" id="setup-constraints">
+<h3>Setup constraints<a class="headerlink" href="#setup-constraints" title="Permalink to this headline"></a></h3>
+<p>Copy the following lines in <code class="docutils literal notranslate"><span class="pre">setup_dvcon.py</span></code>:</p>
+<p>This script defines the wing geometrical constraints, similarly to what is discussed in the geometric parametrization section of the <span class="xref std std-ref">MACH-Aero tutorial</span>.
+There are no specific additions related to the aerostructural case.</p>
+</div>
+<div class="section" id="setup-mesh-warping">
+<h3>Setup mesh warping<a class="headerlink" href="#setup-mesh-warping" title="Permalink to this headline"></a></h3>
+<p>Copy the following lines in <code class="docutils literal notranslate"><span class="pre">setup_warp.py</span></code>:</p>
+<p>This is the same script we used for <a class="reference internal" href="aerostruct_analysis.html#aux-files"><span class="std std-ref">aerostructural analysis</span></a>.</p>
+</div>
+<div class="section" id="setup-aerodynamics">
+<h3>Setup aerodynamics<a class="headerlink" href="#setup-aerodynamics" title="Permalink to this headline"></a></h3>
+<p>Copy the following lines in <code class="docutils literal notranslate"><span class="pre">setup_adflow.py</span></code>:</p>
+<p>This is the same script we used for <a class="reference internal" href="aerostruct_analysis.html#aux-files"><span class="std std-ref">aerostructural analysis</span></a>.</p>
+</div>
+<div class="section" id="setup-structure">
+<h3>Setup structure<a class="headerlink" href="#setup-structure" title="Permalink to this headline"></a></h3>
+<p>You can copy-paste the script illustrated in <a class="reference internal" href="struct_analysis.html#struct-analysis"><span class="std std-ref">Structural analysis with TACS</span></a>, reported below for your convenience:</p>
+</div>
+</div>
+<div class="section" id="dissecting-the-aerostructural-optimization-script">
+<h2>Dissecting the aerostructural optimization script<a class="headerlink" href="#dissecting-the-aerostructural-optimization-script" title="Permalink to this headline"></a></h2>
+<p>We now go over the main runscript.</p>
+<div class="section" id="inputs-and-aircraft-data">
+<h3>Inputs and aircraft data<a class="headerlink" href="#inputs-and-aircraft-data" title="Permalink to this headline"></a></h3>
+<p>We import most of the MACH core classes at the top of the script, together with the auxiliary setup files discussed above.
+Note that we store the input file names in a separate <code class="docutils literal notranslate"><span class="pre">files</span></code> dictionary that is passed to the setup files.</p>
+<p>For this example we use a few input arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">output</span></code>: the name of the folder where solver outputs are stored</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shape</span></code>: by default, shape variables are not added to the optimization problem. You need to specifically use this argument when running the script in order to run the <cite>full</cite> example</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">npcruise</span></code> and <code class="docutils literal notranslate"><span class="pre">npmaneuver</span></code>: define the number of procs allocated to the cruise and maneuver aerostruct problems respectively. Remember that you need to call <code class="docutils literal notranslate"><span class="pre">mpirun</span></code> with the exact number of allocated procs, in this case <code class="docutils literal notranslate"><span class="pre">-np</span> <span class="pre">4</span></code></p></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="setting-up-mpi-communicators">
+<h3>Setting up MPI communicators<a class="headerlink" href="#setting-up-mpi-communicators" title="Permalink to this headline"></a></h3>
+<p>To enable multiple flight conditions or other processes to be run in parallel (were each is by itself a parallel process) we rely on the <code class="docutils literal notranslate"><span class="pre">multipoint</span></code> package.
+More specifically, we use the <code class="xref py py-class docutils literal notranslate"><span class="pre">multipoint.multiPointSparse</span></code> module.
+For more detailed information on any of the calls described here please see the <span class="xref std std-ref">multipoint</span> documentation.</p>
+<p>Once the multipoint object has been created two processor sets are created with <code class="xref py py-meth docutils literal notranslate"><span class="pre">MP.addProcessorSet()</span></code> for each flight condition, cruise and maneuver, with each set receiving <code class="docutils literal notranslate"><span class="pre">npcruise</span></code> and <code class="docutils literal notranslate"><span class="pre">npmaneuver</span></code> processors, respectively.
+Note that the <code class="docutils literal notranslate"><span class="pre">nMembers</span></code> argument is set to 1 since we only have one cruise and one maneuver flight conditions.
+For example, running 5 cruise and 3 maneuver flight conditions <code class="docutils literal notranslate"><span class="pre">nMembers</span></code> are 5 and 3 for the cruise and maneuver calls, respectively.</p>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">MP.createCommunicators()</span></code> creates communicators based on the processor sets defined previously.
+This <code class="docutils literal notranslate"><span class="pre">comm</span></code> object is shared within each processor set, in this case all the cruise processors share one instance and all the maneuver objects share another.
+Since we want separate solver instances for each analysis point, we use this <code class="docutils literal notranslate"><span class="pre">comm</span></code> object when instantiating these solvers.
+On the other hand, <code class="docutils literal notranslate"><span class="pre">MP.gcomm</span></code> refers to the “global” <code class="docutils literal notranslate"><span class="pre">comm</span></code> object, which is shared for <cite>all</cite> processors.
+More specifically, <code class="docutils literal notranslate"><span class="pre">MP.gcomm</span></code> is the communicator that was used to instantiate the MP object, which in this case is <code class="docutils literal notranslate"><span class="pre">MPI.COMM_WORLD</span></code>.
+This is used for tasks that are not dependent on each analysis point, e.g. creating the output directory (which is done only on the root processor, hence the <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">MP.gcomm.rank</span> <span class="pre">==</span> <span class="pre">0</span></code> line).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">setComm</span></code> communicator is not needed here and is in general rarely used as communication within a set is rarely needed.
+The <code class="docutils literal notranslate"><span class="pre">setFlags</span></code> and <code class="docutils literal notranslate"><span class="pre">ptID</span></code> variables are important and can be used to perform operations on a specific group withing a set.
+However, since we have only one group within a processor set this will not be explicitly demonstrated here.
+Finally, <code class="docutils literal notranslate"><span class="pre">groupFlags</span></code> is rarely needed and is not demonstrated here.</p>
+<p>Storing the <code class="docutils literal notranslate"><span class="pre">setName</span></code> of a given processor is useful and can in many cases simplify the run script.
+The <code class="xref py py-meth docutils literal notranslate"><span class="pre">MP.getSetName()</span></code> conveniently returns the <code class="docutils literal notranslate"><span class="pre">setName</span></code> for a given processor.
+Similarly, <code class="xref py py-meth docutils literal notranslate"><span class="pre">MP.createDirectories()</span></code> conveniently creates output directories on disk for each processor group in all processor sets.
+Since we only have two flight conditions in this example two output directories, <code class="docutils literal notranslate"><span class="pre">cruise_0</span></code> and <code class="docutils literal notranslate"><span class="pre">maneuver_0</span></code> are created for the <code class="docutils literal notranslate"><span class="pre">cruise</span></code> and <code class="docutils literal notranslate"><span class="pre">maneuver</span></code> conditions, respectively.
+In conjunction with the <code class="docutils literal notranslate"><span class="pre">setName</span></code> and <code class="docutils literal notranslate"><span class="pre">ptID</span></code> we can access the <code class="docutils literal notranslate"><span class="pre">ptDirs</span></code> dictionary that contains the output directory for each of the processor groups.</p>
+<p>During the analysis or an optimization a large amount of output is printed to the screen.
+To save and organize the output based on the flight condition of interest <code class="docutils literal notranslate"><span class="pre">redirectIO</span></code> can be used to redirect the <code class="docutils literal notranslate"><span class="pre">stdout</span></code> stream directly to files.
+Before doing so, first the necessary folder is created, followed by file handles for each <code class="docutils literal notranslate"><span class="pre">ptID</span></code>.</p>
+</div>
+<div class="section" id="defining-the-cruise-and-maneuver-design-points">
+<span id="des-points"></span><h3>Defining the cruise and maneuver design points<a class="headerlink" href="#defining-the-cruise-and-maneuver-design-points" title="Permalink to this headline"></a></h3>
+<p>For this example we define a two-point problem, with one cruise and one maneuver design point.
+As mentioned above, the cruise design point is used to provide the mass and drag of the wing for the objective function of the problem.
+The maneuver case conversely is used to estimate the stress constraints using the KS function with a 2.5g load factor.
+Both design points must satisfy a lift (equality) constraint.
+The two <code class="xref py py-class docutils literal notranslate"><span class="pre">Aerostruct()</span></code> instances are appended to two separate cases that are later passed to separate methods for function and sensitivity evaluations.</p>
+<p>The code closely resembles what was discussed in <a class="reference internal" href="aerostruct_analysis.html#aerostruct-analysis"><span class="std std-ref">Aerostructural analysis with ADflow and TACS</span></a>.
+Note that we include the angle of attack <code class="docutils literal notranslate"><span class="pre">alpha</span></code> as a design variable (<code class="docutils literal notranslate"><span class="pre">ap.addDV(&quot;alpha&quot;,[...])</span></code>) for both design points, to facilitate the satisfaction of the lift constraints.</p>
+</div>
+<div class="section" id="setting-up-the-solvers-and-geometry-objects">
+<h3>Setting up the solvers and geometry objects<a class="headerlink" href="#setting-up-the-solvers-and-geometry-objects" title="Permalink to this headline"></a></h3>
+<p>In this section of the code we put together several snippets and components we have already discussed.
+Similarly to what is done in <span class="xref std std-ref">MACH-Aero optimization tutorial</span>, we setup the <code class="docutils literal notranslate"><span class="pre">pyGeo</span></code> and <code class="docutils literal notranslate"><span class="pre">IDWarp</span></code> objects and associate them to the <code class="docutils literal notranslate"><span class="pre">ADflow</span></code> solver.
+The <code class="docutils literal notranslate"><span class="pre">pyGeo</span></code> object is also associated with the structural solver (<code class="docutils literal notranslate"><span class="pre">FEASolver.setDVGeo(DVGeo)</span></code>), to ensure that geometry changes are reflected on the structural mesh.
+The aerostructural solver setup is identical to what was shown in the previous <a class="reference internal" href="aerostruct_analysis.html#setup-assolver"><span class="std std-ref">Setup pyAeroStructure</span></a> section.
+We use the block Gauss-Seidel method (<code class="docutils literal notranslate"><span class="pre">MDSolver:</span> <span class="pre">&quot;GS&quot;</span></code>) to iterate the MDA to convergence.
+Note that at the end of this snippet, the geometric constraints are added to the problem using the separate setup file mentioned in the previous section.</p>
+</div>
+<div class="section" id="defining-the-functions-of-interests-and-their-sensitivities">
+<span id="def-objcon"></span><h3>Defining the functions of interests and their sensitivities<a class="headerlink" href="#defining-the-functions-of-interests-and-their-sensitivities" title="Permalink to this headline"></a></h3>
+<p>We define the function evaluation and sensitivities here, for each processor set.
+These functions are almost identical between cruise and maneuver, except for looping over different aerostructural problems.
+We also evaluate geometric constraints (and their sensitivities) on the cruise processor set only, since the geometry is shared and the jig shape is the same between the two.
+Lastly, we define the <code class="docutils literal notranslate"><span class="pre">objCon</span></code> function for combining functionals into objective and constraint values.</p>
+<p>Note that for this specific problem, the reference weight for lift constraints <code class="docutils literal notranslate"><span class="pre">Wref</span></code> is the aircraft MTOW, which does not change during the optimization.</p>
+</div>
+<div class="section" id="setting-up-and-running-the-optimization">
+<h3>Setting up and running the optimization<a class="headerlink" href="#setting-up-and-running-the-optimization" title="Permalink to this headline"></a></h3>
+<p>Setting up the optimization problem follows a similar strategy as is discussed in the <span class="xref std std-ref">MACH-Aero tutorial</span>.
+Here we only discuss the differences.</p>
+<p>In addition to the geometric design variables and constraints, we also define structural design variables and constraints that must be added to the optimization problem <code class="docutils literal notranslate"><span class="pre">optProb</span></code>.
+As before, this is achieved with the <code class="docutils literal notranslate"><span class="pre">addVariablesPyOpt</span></code> function.</p>
+<p>Lift equality constraints are also defined here for both cruise and maneuver cases.
+These constraints are added directly to the optimization problem using the <code class="docutils literal notranslate"><span class="pre">optProb.addcon</span></code> function.
+For both, the idea here is that lift should equal the weight.
+Note that derivatives are computed with respect to all design variables relevant to its respective flight condition.
+For example, the <code class="docutils literal notranslate"><span class="pre">cruise_lift_con</span></code> derivative is computed with respect to the structure, angle of attack, and geometric design variables, but not the maneuver angle of attack.
+Three KS constraints corresponding to the maneuver flight condition are then added.
+Note that the constraint name has to be composed of the structural problem name and the function names listed in the <code class="docutils literal notranslate"><span class="pre">evalFuncs</span></code> list of that structural problem.</p>
+<p>Finally, we add the objective name and a scaling value.
+The scaling value is chosen to be of similar order of magnitude as the drag.
+Once the function handles have been provided to the multipoint object the optimizer setup is done in a similar way as before.
+To make sure the optimization problem, i.e., design variables and constraints, is correctly set up the user should study the stdout from the <code class="docutils literal notranslate"><span class="pre">print(optProb)</span></code> and the <code class="docutils literal notranslate"><span class="pre">printSparsity()</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="opt_struct.html" class="btn btn-neutral float-left" title="Structural Optimization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overset_overview.html" class="btn btn-neutral float-right" title="Aerodynamic Analysis and Optimization with Overset Meshes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

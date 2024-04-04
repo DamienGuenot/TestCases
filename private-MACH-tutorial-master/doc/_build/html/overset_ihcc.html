@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checking the Overset Mesh &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Analysis with ADflow" href="overset_analysis.html" />
+    <link rel="prev" title="Volume Meshing" href="overset_volume_meshes.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overset_geom.html">Geometry and Surface Mesh Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_volume_meshes.html">Volume Meshing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Checking the Overset Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_analysis.html">Analysis with ADflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ffds.html">Creating FFD Grids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_opt.html">Optimization with ADflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a> &raquo;</li>
+      <li>Checking the Overset Mesh</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overset_ihcc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="checking-the-overset-mesh">
+<span id="overset-ihcc"></span><h1>Checking the Overset Mesh<a class="headerlink" href="#checking-the-overset-mesh" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>Getting different meshes that are overset to work well together can be tricky.
+Here we will show how ADflow can be used to check if there will be any problems with the hole-cutting algorithm and connectivities, and also to visualize which cells are compute cells, interpolate cells, blanked cells, and flooded cells.</p>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>Navigate to the directory <code class="docutils literal notranslate"><span class="pre">oversetopt/ihc_check</span></code> in your tutorial folder.
+Copy the following files from the volume meshing directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cp ../mesh/volume/overset_combined.cgns .
+</pre></div>
+</div>
+<p>Create the following empty runscript in the current directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ihc_check.py</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="dissecting-the-adflow-runscript">
+<h2>Dissecting the ADflow runscript<a class="headerlink" href="#dissecting-the-adflow-runscript" title="Permalink to this headline"></a></h2>
+<p>Open the file <code class="docutils literal notranslate"><span class="pre">ihc_check.py</span></code> with your favorite text editor.
+Then copy the following into this file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">baseclasses</span> <span class="kn">import</span> <span class="n">AeroProblem</span>
+<span class="kn">from</span> <span class="nn">adflow</span> <span class="kn">import</span> <span class="n">ADFLOW</span>
+
+<span class="c1"># from mpi4py import MPI</span>
+<span class="c1"># import shutil</span>
+<span class="c1"># import collections</span>
+
+<span class="c1"># ======================================================================</span>
+<span class="c1">#         Input Information</span>
+<span class="c1"># ======================================================================</span>
+
+<span class="c1"># File name of the mesh</span>
+<span class="n">gridFile</span> <span class="o">=</span> <span class="s2">&quot;overset_combined.cgns&quot;</span>
+
+<span class="c1"># Common aerodynamic problem description and design variables</span>
+<span class="n">ap</span> <span class="o">=</span> <span class="n">AeroProblem</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ihc_check&quot;</span><span class="p">,</span> <span class="n">mach</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">altitude</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">areaRef</span><span class="o">=</span><span class="mf">0.24</span> <span class="o">*</span> <span class="mf">0.64</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">chordRef</span><span class="o">=</span><span class="mf">0.24</span><span class="p">)</span>
+
+<span class="c1"># dictionary with name of the zone as a key and a factor to multiply it with.</span>
+<span class="n">oversetpriority</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">aeroOptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Common Parameters</span>
+    <span class="s2">&quot;gridFile&quot;</span><span class="p">:</span> <span class="n">gridFile</span><span class="p">,</span>
+    <span class="s2">&quot;outputDirectory&quot;</span><span class="p">:</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mgcycle&quot;</span><span class="p">:</span> <span class="s2">&quot;sg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;volumevariables&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;blank&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;surfacevariables&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;blank&quot;</span><span class="p">],</span>
+    <span class="c1"># Physics Parameters</span>
+    <span class="s2">&quot;equationType&quot;</span><span class="p">:</span> <span class="s2">&quot;RANS&quot;</span><span class="p">,</span>
+    <span class="c1"># Debugging parameters</span>
+    <span class="s2">&quot;debugzipper&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;usezippermesh&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;nrefine&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>  <span class="c1"># number of times to run IHC cycle</span>
+    <span class="s2">&quot;nearwalldist&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s2">&quot;oversetpriority&quot;</span><span class="p">:</span> <span class="n">oversetpriority</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1"># Create solver</span>
+<span class="n">CFDSolver</span> <span class="o">=</span> <span class="n">ADFLOW</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">aeroOptions</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Uncoment this if just want to check flooding</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">setAeroProblem</span><span class="p">(</span><span class="n">ap</span><span class="p">)</span>
+
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gridFile</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">CFDSolver</span><span class="o">.</span><span class="n">writeVolumeSolutionFile</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_IHC.cgns&quot;</span><span class="p">,</span> <span class="n">writeGrid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will not actually run a flow simulation, it will just carry out the setup.
+Adding <code class="docutils literal notranslate"><span class="pre">'blank'</span></code> to the <code class="docutils literal notranslate"><span class="pre">volumevariables</span></code> and <code class="docutils literal notranslate"><span class="pre">surfacevariables</span></code> (which tells ADflow which variables to save in the results) will allow us to see which cells are compute, interpolate, blanked, and flooded cells.</p>
+<p>There are some new parameters here related to overset meshes that we have not seen before.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">usezippermesh</span></code> option is <code class="docutils literal notranslate"><span class="pre">True</span></code> by default so we set it to <code class="docutils literal notranslate"><span class="pre">False</span></code> here to skip the zipper mesh generation, because it may crash if the hole cutting does not work. A zipper mesh provides a watertight surface for force integration in the region where cells overlap.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">nrefine</span></code> option is set to 10 (this is the default). This option specifies the number of times the implicit hole cutting algorithm is run.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">nearwalldist</span></code> option is set to 0.1 (this is the default). This option controls how compute cells are preserved near walls. Changing this value may prevent flooding. We usually use 0.01 m for a full-scale aircraft mesh.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">oversetpriority</span></code> option can be used to specify a dictionary in which the key is the family name of a mesh and the corresponding value is a factor to multiply the volumes of that mesh’s cells by for the hole-cutting algorithm. The hole-cutting algorithm prioritizes keeping smaller cells, so this can be used to prioritize keeping the cells of a certain volume mesh. We don’t specify anything for the <code class="docutils literal notranslate"><span class="pre">oversetpriority</span></code> but just include it here to show some of the options available.</p></li>
+</ul>
+</div></blockquote>
+<p>There are other overset options that have not been discussed here.
+Those can be found in the <a class="reference external" href="https://github.com/mdolab/adflow/blob/master/python/pyADflow.py">pyADflow run script</a>.</p>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<p>Run the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python ihc_check.py
+</pre></div>
+</div>
+<p>If all goes well, the output will show that there are 0 <code class="docutils literal notranslate"><span class="pre">orphans</span></code> and there will not be any error messages related to connectivities.</p>
+</div>
+<div class="section" id="visualizing-the-iblank-values-in-tecplot">
+<h2>Visualizing the iblank values in tecplot<a class="headerlink" href="#visualizing-the-iblank-values-in-tecplot" title="Permalink to this headline"></a></h2>
+<p>Now we can check what roles the different cells in the overlapping regions have been given.
+Follow the following instructions in Tecplot.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Load <code class="docutils literal notranslate"><span class="pre">overset_combined_IHC.cgns</span></code> but check <code class="docutils literal notranslate"><span class="pre">Advanced</span> <span class="pre">options</span></code> before clicking <code class="docutils literal notranslate"><span class="pre">Open</span></code></p></li>
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">One</span> <span class="pre">Tecplot</span> <span class="pre">zone</span> <span class="pre">per</span> <span class="pre">non-poly</span> <span class="pre">CGNS</span> <span class="pre">zone/solution</span></code> and click <code class="docutils literal notranslate"><span class="pre">OK</span></code></p></li>
+<li><p>Check <code class="docutils literal notranslate"><span class="pre">Mesh</span></code> under <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">zone</span> <span class="pre">layers</span></code> (select <code class="docutils literal notranslate"><span class="pre">yes</span></code> if it asks you if you want to turn on surfaces)</p></li>
+<li><p>Zoom in to the symmetry plane</p></li>
+<li><p>Check <code class="docutils literal notranslate"><span class="pre">Contour</span></code> under <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">zone</span> <span class="pre">layers</span></code></p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Details...</span></code> next to <code class="docutils literal notranslate"><span class="pre">Contour</span></code></p></li>
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">iblank</span></code> in the drop-down menu at the top left</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Set</span> <span class="pre">levels...</span></code> and set the minimum level to -3 and the maximum level to 0</p></li>
+<li><p>Set the number of levels to 4, then click <code class="docutils literal notranslate"><span class="pre">OK</span></code> and <code class="docutils literal notranslate"><span class="pre">Close</span></code></p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Zone</span> <span class="pre">Style...</span></code>, go to the <code class="docutils literal notranslate"><span class="pre">Contour</span></code> tab, then highlight all the zones (ctrl+A) and change the <code class="docutils literal notranslate"><span class="pre">Contour</span> <span class="pre">Type</span></code> to <code class="docutils literal notranslate"><span class="pre">Primary</span> <span class="pre">value</span> <span class="pre">flood</span></code> (right click on the contour type of one of the zones)</p></li>
+<li><p>Under the <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">Contour</span></code> column, uncheck all the <code class="docutils literal notranslate"><span class="pre">wing_vols_combine</span></code> zones and then click <code class="docutils literal notranslate"><span class="pre">Close</span></code></p></li>
+<li><p>Finally, uncheck <code class="docutils literal notranslate"><span class="pre">Shade</span></code> under <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">zone</span> <span class="pre">layers</span></code> if it was selected by default</p></li>
+</ul>
+</div></blockquote>
+<p>You should see something like the following image.</p>
+<a class="reference internal image-reference" href="_images/overset_iblank_background.png"><img alt="_images/overset_iblank_background.png" src="_images/overset_iblank_background.png" style="width: 604.0px; height: 537.0px;" /></a>
+<p>Now turn off the contours for all the <code class="docutils literal notranslate"><span class="pre">background</span></code> zones and switch on the contours for all the <code class="docutils literal notranslate"><span class="pre">wing_vols_combine</span></code> zones.</p>
+<a class="reference internal image-reference" href="_images/overset_iblank_wings.png"><img alt="_images/overset_iblank_wings.png" src="_images/overset_iblank_wings.png" style="width: 592.0px; height: 529.5px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In Tecplot, <code class="docutils literal notranslate"><span class="pre">Plot</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Blanking</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Value</span> <span class="pre">Blanking</span></code> is a useful tool to hide or show cells with certain values (e.g., if you want to see only the interpolation cells and hide everything else).</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overset_volume_meshes.html" class="btn btn-neutral float-left" title="Volume Meshing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overset_analysis.html" class="btn btn-neutral float-right" title="Analysis with ADflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

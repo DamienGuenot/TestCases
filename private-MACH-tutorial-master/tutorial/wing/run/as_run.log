@@ -1,0 +1,563 @@
+#
+# ADflow, multiblock structured flow solver
+#
+# This code solves the 3D RANS, laminar NS or Euler equations
+# on multiblock structured hexahedral grids.
+# This is a parallel executable running on 8 processors.
+# It has been compiled with the following options:
+# - Optimized mode.
+# - Size of standard integers: 4 bytes.
+# - Size of standard floating point types: 8 bytes.
+# - With cgns support
+# - With support for signals.
+#
++----------------------------------------+
+|          All ADFLOW Options:           |
++----------------------------------------+
+{'ADPC': False,
+ 'AGMGLevels': 1,
+ 'AGMGNSmooth': 3,
+ 'ANKADPC': False,
+ 'ANKASMOverlap': 2,
+ 'ANKCFL0': 5.0,
+ 'ANKCFLCutback': 0.5,
+ 'ANKCFLExponent': 0.5,
+ 'ANKCFLFactor': 10.0,
+ 'ANKCFLLimit': 100000.0,
+ 'ANKCFLMin': 1.0,
+ 'ANKConstCFLStep': 0.4,
+ 'ANKCoupledSwitchTol': 1e-16,
+ 'ANKInnerPreconIts': 1,
+ 'ANKJacobianLag': 10,
+ 'ANKLinResMax': 0.1,
+ 'ANKLinearSolveTol': 0.05,
+ 'ANKMaxIter': 80,
+ 'ANKNSubiterTurb': 1,
+ 'ANKOuterPreconIts': 1,
+ 'ANKPCILUFill': 2,
+ 'ANKPCUpdateTol': 0.5,
+ 'ANKPhysicalLSTol': 0.2,
+ 'ANKPhysicalLSTolTurb': 0.99,
+ 'ANKSecondOrdSwitchTol': 1e-16,
+ 'ANKStepFactor': 1.0,
+ 'ANKStepMin': 0.01,
+ 'ANKSubspaceSize': -1,
+ 'ANKSwitchTol': 1.0,
+ 'ANKTurbCFLScale': 1.0,
+ 'ANKTurbKSPDebug': False,
+ 'ANKUnsteadyLSTol': 1.0,
+ 'ANKUseFullVisc': True,
+ 'ANKUseMatrixFree': True,
+ 'ANKUseTurbDADI': True,
+ 'ASMOverlap': 1,
+ 'CFL': 1.7,
+ 'CFLCoarse': 1.0,
+ 'CFLLimit': 1.5,
+ 'GMRESOrthogonalizationType': 'modified Gram-Schmidt',
+ 'ILUFill': 2,
+ 'L2Convergence': 1e-10,
+ 'L2ConvergenceCoarse': 0.01,
+ 'L2ConvergenceRel': 0.1,
+ 'MGCycle': 'sg',
+ 'MGStartLevel': -1,
+ 'NKADPC': False,
+ 'NKASMOverlap': 1,
+ 'NKFixedStep': 0.25,
+ 'NKInnerPreconIts': 1,
+ 'NKJacobianLag': 20,
+ 'NKLS': 'cubic',
+ 'NKLinearSolveTol': 0.3,
+ 'NKOuterPreconIts': 1,
+ 'NKPCILUFill': 2,
+ 'NKSubspaceSize': 60,
+ 'NKSwitchTol': 0.0001,
+ 'NKUseEW': True,
+ 'NKViscPC': False,
+ 'RKReset': False,
+ 'TSStability': False,
+ 'adjointDivTol': 100000.0,
+ 'adjointL2Convergence': 1e-06,
+ 'adjointL2ConvergenceAbs': 1e-16,
+ 'adjointL2ConvergenceRel': 1e-16,
+ 'adjointMaxIter': 2000,
+ 'adjointMaxL2DeviationFactor': 1.0,
+ 'adjointMonitorStep': 10,
+ 'adjointSolver': 'GMRES',
+ 'adjointSubspaceSize': 100,
+ 'alphaFollowing': True,
+ 'alphaMode': False,
+ 'altitudeMode': False,
+ 'applyAdjointPCSubspaceSize': 20,
+ 'applyPCSubspaceSize': 10,
+ 'approxPC': True,
+ 'backgroundVolScale': 1.0,
+ 'betaMode': False,
+ 'blockSplitting': True,
+ 'cavitationNumber': 1.4,
+ 'closedSurfaceFamilies': None,
+ 'coarseDiscretization': 'central plus scalar dissipation',
+ 'computeCavitation': False,
+ 'coupledSolution': False,
+ 'cutCallback': None,
+ 'debugZipper': False,
+ 'deltaT': 0.01,
+ 'designSurfaceFamily': None,
+ 'discretization': 'central plus scalar dissipation',
+ 'dissipationLumpingParameter': 6.0,
+ 'dissipationScalingExponent': 0.67,
+ 'eddyVisInfRatio': 0.009,
+ 'equationMode': 'steady',
+ 'equationType': 'RANS',
+ 'eulerWallTreatment': 'linear pressure extrapolation',
+ 'firstRun': True,
+ 'flowType': 'external',
+ 'forcesAsTractions': True,
+ 'frozenTurbulence': False,
+ 'globalPreconditioner': 'additive Schwarz',
+ 'gridFile': 'INPUT/wing_vol.cgns',
+ 'gridPrecision': 'double',
+ 'gridPrecisionSurface': 'single',
+ 'infChangeCorrection': True,
+ 'innerPreconIts': 1,
+ 'isoVariables': [],
+ 'isosurface': {},
+ 'liftIndex': 2,
+ 'limiter': 'van Albada',
+ 'loadBalanceIter': 10,
+ 'loadImbalance': 0.1,
+ 'localPreconditioner': 'ILU',
+ 'lowSpeedPreconditioner': False,
+ 'machMode': False,
+ 'matrixOrdering': 'RCM',
+ 'maxL2DeviationFactor': 1.0,
+ 'meshSurfaceFamily': None,
+ 'monitorVariables': ['resrho', 'cl', 'cd'],
+ 'nCycles': 1000,
+ 'nCyclesCoarse': 500,
+ 'nFloodIter': -1,
+ 'nRKReset': 5,
+ 'nRefine': 10,
+ 'nSaveSurface': 1,
+ 'nSaveVolume': 1,
+ 'nSubiter': 1,
+ 'nSubiterTurb': 3,
+ 'nTimeStepsCoarse': 48,
+ 'nTimeStepsFine': 400,
+ 'nearWallDist': 0.1,
+ 'numberSolutions': True,
+ 'outerPreconIts': 3,
+ 'outputDirectory': 'output_as_run',
+ 'outputSurfaceFamily': 'allSurfaces',
+ 'overlapFactor': 0.9,
+ 'oversetLoadBalance': True,
+ 'oversetPriority': {},
+ 'oversetProjTol': 1e-12,
+ 'oversetUpdateMode': 'frozen',
+ 'pMode': False,
+ 'partitionLikeNProc': -1,
+ 'partitionOnly': False,
+ 'preconditionerSide': 'right',
+ 'printAllOptions': True,
+ 'printIntro': True,
+ 'printIterations': False,
+ 'printTiming': False,
+ 'printWarnings': True,
+ 'qMode': False,
+ 'rMode': False,
+ 'resAveraging': 'alternate',
+ 'restartAdjoint': True,
+ 'restartFile': None,
+ 'restrictionRelaxation': 0.8,
+ 'selfZipCutoff': 120.0,
+ 'sepSensorOffset': 0.0,
+ 'sepSensorSharpness': 10.0,
+ 'setMonitor': False,
+ 'skipAfterFailedAdjoint': True,
+ 'smoothParameter': 1.5,
+ 'smoother': 'DADI',
+ 'solutionPrecision': 'single',
+ 'solutionPrecisionSurface': 'single',
+ 'storeConvHist': True,
+ 'storeRindLayer': True,
+ 'surfaceVariables': ['cp', 'vx', 'vy', 'vz', 'mach'],
+ 'timeAccuracy': 2,
+ 'timeIntegrationScheme': 'BDF',
+ 'timeIntervals': 1,
+ 'timeLimit': -1.0,
+ 'turbResScale': 10000.0,
+ 'turbulenceModel': 'SA',
+ 'turbulenceOrder': 'first order',
+ 'turbulenceProduction': 'strain',
+ 'useALE': True,
+ 'useANKSolver': True,
+ 'useApproxWallDistance': True,
+ 'useBlockettes': True,
+ 'useDiagTSPC': True,
+ 'useExternalDynamicMesh': False,
+ 'useGridMotion': False,
+ 'useLinResMonitor': False,
+ 'useMatrixFreedrdw': True,
+ 'useNKSolver': True,
+ 'useOversetWallScaling': False,
+ 'useQCR': False,
+ 'useRotationSA': False,
+ 'useTSInterpolatedGridVelocity': False,
+ 'useWallFunctions': False,
+ 'useZipperMesh': True,
+ 'useft2SA': True,
+ 'verifyExtra': True,
+ 'verifySpatial': True,
+ 'verifyState': True,
+ 'vis2': 0.25,
+ 'vis2Coarse': 0.5,
+ 'vis4': 0.0156,
+ 'viscPC': False,
+ 'viscWallTreatment': 'constant pressure extrapolation',
+ 'viscousSurfaceVelocities': True,
+ 'volumeVariables': ['resrho'],
+ 'wallDistCutoff': 1e+20,
+ 'windAxis': False,
+ 'writeSolutionEachIter': False,
+ 'writeSurfaceSolution': True,
+ 'writeTecplotSurfaceSolution': True,
+ 'writeVolumeSolution': True,
+ 'zipperSurfaceFamily': None}
+#
+#                      Warning
+# It is assumed that the grid is given in meters.
+#
+#
+# Specified load imbalance tolerance  0.100 acheived
+# Continuing with  0.032 load imbalance for the cells and  0.084 for the faces
+#
+#
+# Grid level: 1, Total number of cells: 193536
+#
++--------------------------------------------------+
+  CGNS Surface Families by Boundary Condition Type
++--------------------------------------------------+
+| Wall Types           : wall 
+| Inflow Types         : 
+| Outflow Types        : 
+| Symmetry Types       : sym 
+| Farfield Types       : far 
+| Overset Types        : 
++--------------------------------------------------+
++----------------------------------------+
+|          All IDWarp Options:           |
++----------------------------------------+
+{'LdefFact': 1.0,
+ 'aExp': 3.0,
+ 'alpha': 0.25,
+ 'bExp': 5.0,
+ 'bucketSize': 8,
+ 'cornerAngle': 30.0,
+ 'errTol': 0.0005,
+ 'evalMode': 'fast',
+ 'fileType': 'CGNS',
+ 'gridFile': 'INPUT/wing_vol.cgns',
+ 'restartFile': None,
+ 'specifiedSurfaces': None,
+ 'symmTol': 1e-06,
+ 'symmetryPlanes': None,
+ 'symmetrySurfaces': None,
+ 'useRotations': True,
+ 'zeroCornerRotations': True}
+  -> Reading CGNS File: INPUT/wing_vol.cgns
+    -> Number of Zones:           9
+#------------------------------#
+ Total Volume Nodes :    217413 
+#------------------------------#
++-------------------- Symmetry Planes -------------------+
+|           Point                        Normal          |
+| (  0.000   0.000   0.000)    (  0.000   0.000  -1.000) |
++--------------------------------------------------------+
+#--------------------------------#
+ Unique Surface Nodes :      4077 
+#--------------------------------#
+ Computing Denomenator Estimate...
+ Load Balancing...
+ Finished Mesh Initialization.
++----------------------------------------+
+|           All TACS Options:            |
++----------------------------------------+
+{'KSMSolver': 'GCROT',
+ 'L2Convergence': 1e-12,
+ 'L2ConvergenceRel': 1e-12,
+ 'NLSolver': 'FNR',
+ 'PCFillLevel': 1000,
+ 'PCFillRatio': 20.0,
+ 'familySeparator': '/',
+ 'flexible': 1,
+ 'forcesOnUpdatedGeo': False,
+ 'gravityVector': [0, -9.81, 0],
+ 'intersectionTol': 0.2,
+ 'maxItersPCReset': 25,
+ 'maxLoadCases': 20,
+ 'monitorFrequency': 10,
+ 'nNLIter': 10,
+ 'nRestarts': 15,
+ 'numberSolutions': True,
+ 'orderingType': 'ND',
+ 'outputDir': 'output_as_run',
+ 'printAllOptions': True,
+ 'printIterations': True,
+ 'printLevel': 0,
+ 'printTiming': False,
+ 'probName': 'defaultName',
+ 'projectVector': [0, 1, 0],
+ 'resNormUB': 1e+20,
+ 'solutionType': 'linear',
+ 'subSpaceSize': 10,
+ 'transferClosestPointFailurePrintLimit': 25,
+ 'transferDirection': None,
+ 'transferFileName': '',
+ 'transferGaussOrder': 4,
+ 'transferSearchMaxIter': 1000,
+ 'transferSize': 0.5,
+ 'useDVMap': False,
+ 'useMonitor': False,
+ 'useRigidMoment': False,
+ 'varsPerNode': 6,
+ 'writeBDF': False,
+ 'writeCoordinateFrame': False,
+ 'writeDesignVariables': True,
+ 'writeDisplacements': True,
+ 'writeExtras': True,
+ 'writeNodes': True,
+ 'writeSolution': True,
+ 'writeStrains': True,
+ 'writeStresses': True}
+[6] Creating TACSAssembler with numOwnedNodes = 882 numElements = 926
+[7] Creating TACSAssembler with numOwnedNodes = 913 numElements = 966
+[0] Creating TACSAssembler with numOwnedNodes = 1025 numElements = 982
+[0] TACSAssembler: Total dof = 44076 Total nodes = 7346 Total elements = 7632
+[1] Creating TACSAssembler with numOwnedNodes = 904 numElements = 973
+[2] Creating TACSAssembler with numOwnedNodes = 860 numElements = 926
+[3] Creating TACSAssembler with numOwnedNodes = 953 numElements = 963
+[4] Creating TACSAssembler with numOwnedNodes = 954 numElements = 970
+[5] Creating TACSAssembler with numOwnedNodes = 855 numElements = 926
++----------------------------------------+
+|     All LDTransfer Object Options:     |
++----------------------------------------+
+{'MDGroup': None, 'outputDir': './', 'printTiming': False}
+
++------------------------------------------------------------------------------+
+| pyADFLOW Warning: 'zipperSurfaceFamily' option was not given. Using all wall |
+| boundary conditions for the zipper mesh.                                     |
++------------------------------------------------------------------------------+
+
+[2] LDTransfer: Created 320 sub-cells. Sub-cell density 1.000
+[3] LDTransfer: Created 16 sub-cells. Sub-cell density 1.000
+[4] LDTransfer: Created 1600 sub-cells. Sub-cell density 1.000
+[6] LDTransfer: Created 496 sub-cells. Sub-cell density 1.000
+[0] LDTransfer: Created 1600 sub-cells. Sub-cell density 1.000
++----------------------------------------+
+|       All pyAeroStruct Options:        |
++----------------------------------------+
+{'KSPGMRESGSOrthogonalization': 'modified',
+ 'MDSolver': 'GS',
+ 'MDSubspaceSize': 40,
+ 'NKType': 'newtonls',
+ 'adjointDamp0': 0.5,
+ 'adjointDivTol': 1000000.0,
+ 'adjointKSPSolver': 'fgmres',
+ 'adjointPC': 'GS',
+ 'adjointRelTol': 1e-05,
+ 'adjointSolver': 'KSP',
+ 'adjointSubspaceSize': 40,
+ 'coldStartMDA': False,
+ 'damp0': 0.5,
+ 'dampLB': 0.2,
+ 'dispScale': 1.0,
+ 'matVecRelTol': 1e-12,
+ 'monitorASKSP': False,
+ 'monitorVars': ['cl', 'cd', 'lift', 'norm_u', 'damp'],
+ 'nAdjointIter': 15,
+ 'nGSStartup': 5,
+ 'nMDIter': 25,
+ 'outputDir': 'output_as_run',
+ 'preSolveStructure': True,
+ 'printTiming': False,
+ 'relTol': 1e-05,
+ 'resNormUB': 1000000000000.0,
+ 'restartAdjoint': True,
+ 'saveIterations': True,
+ 'useAitkenAcceleration': True,
+ 'writeIterationSolutions': False,
+ 'writeSolution': True}
++----------------------------------------------------------------------+
+|  Switching to Aero Problem: cruise                                   |
++----------------------------------------------------------------------+
++----------------------------------------------------------------------+
+|  Switching to Struct Problem: cruise                                 |
++----------------------------------------------------------------------+
+[0] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 3.64, nnz(ILU) = 29326
+[0] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 31.49, nnz(ILU) = 8724
+[0] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 31.49, nnz(ILU) = 8724
+[0] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.65, nnz(ILU) = 11671
+[5] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 4.17, nnz(ILU) = 29829
+[5] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 38.32, nnz(ILU) = 14638
+[5] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 38.32, nnz(ILU) = 14638
+[5] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.73, nnz(ILU) = 21609
+[1] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 4.22, nnz(ILU) = 31311
+[1] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 37.32, nnz(ILU) = 16197
+[1] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 37.32, nnz(ILU) = 16197
+[1] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.83, nnz(ILU) = 27225
+[6] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 4.22, nnz(ILU) = 32069
+[6] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 33.73, nnz(ILU) = 8499
+[6] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 33.73, nnz(ILU) = 8499
+[6] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.51, nnz(ILU) = 8836
+[2] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 4.10, nnz(ILU) = 28302
+[2] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 34.71, nnz(ILU) = 16417
+[2] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 34.71, nnz(ILU) = 16417
+[2] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.96, nnz(ILU) = 32041
+[3] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 3.97, nnz(ILU) = 28822
+[3] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 34.18, nnz(ILU) = 15279
+[3] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 34.18, nnz(ILU) = 15279
+[3] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.93, nnz(ILU) = 28907
+[7] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 3.84, nnz(ILU) = 27596
+[7] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 31.47, nnz(ILU) = 15862
+[7] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 31.47, nnz(ILU) = 15862
+[7] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 1.07, nnz(ILU) = 34596
+[7] PDMat factorization: M: 3546 N: 3546
+[7] initial density: 0.534 factor fill in: 0.020
+[4] BCSRMat: ILU(1000) Input fill ratio 20.00, actual fill ratio: 4.30, nnz(ILU) = 32404
+[4] BCSRMat: L^{-1}*E Input fill ratio 20.00, actual fill ratio: 35.14, nnz(ILU) = 13881
+[4] BCSRMat: F*U^{-1} Input fill ratio 20.00, actual fill ratio: 35.14, nnz(ILU) = 13881
+[4] BCSRMat: (C + A*B) Input fill ratio 20.00, actual fill ratio: 0.71, nnz(ILU) = 20164
++------------------------------------+
+|    Begin solve with GS MDSolver    |
++------------------------------------+
+Iter         CPU Type           Res CFD            Res FEA                 cl                 cd               lift             norm_u               damp  
+ 000  1.2853e+01   GS  8.7649531648e+06   8.9977531459e+03   1.5580731773e-01   2.4219782266e-01   8.4163049285e+04   2.4090957887e+00   5.0000000000e-01
+ 001  2.3691e+01   GS  7.9434710392e+05   5.4423034960e+03   1.8842209487e-01   1.0234654775e-01   1.0178070124e+05   6.0080049831e+00   1.0000000000e+00
+ 002  4.0106e+01   GS  8.6237170961e+04   6.5693306276e+03   4.9174279776e-01   2.1677993730e-02   2.6562663375e+05   7.8877728747e+00   2.0000000000e-01
+ 003  6.5334e+01   GS  9.9150448267e+03   5.0933071819e+03   4.7151114831e-01   1.9951858102e-02   2.5469802440e+05   1.3262804538e+01   7.7132217037e-01
+ 004  7.3767e+01   GS  1.5415959211e+04   1.1395972747e+03   4.6004741181e-01   1.8456647157e-02   2.4850561294e+05   1.4269055108e+01   9.1571375257e-01
+ 005  9.3695e+01   GS  2.7218945829e+03   3.2203575496e+02   4.3918359373e-01   1.7736282750e-02   2.3723552258e+05   1.3921087700e+01   5.9947327773e-01
+ 006  1.0113e+02   GS  9.9169273150e+02   2.2200069878e+02   4.3367460234e-01   1.7526315772e-02   2.3425970912e+05   1.3588450176e+01   1.0000000000e+00
+ 007  1.0725e+02   GS  9.1060992846e+02   1.2599847540e+01   4.3380956453e-01   1.7555683939e-02   2.3433261217e+05   1.3606842334e+01   9.4475614051e-01
+ 008  1.1456e+02   GS  7.1120005665e+01   4.2674767072e+01   4.3168259242e-01   1.7432936235e-02   2.3318367731e+05   1.3595871141e+01   3.7851661318e-01
+ 009  1.1663e+02   GS  2.5057271511e+01   2.8232416481e+01   4.3164950556e-01   1.7434914544e-02   2.3316580465e+05   1.3577680275e+01   1.0000000000e+00
+ 010  1.1784e+02   GS  4.1711549753e+01   5.4195671929e-01   4.3167556202e-01   1.7440490963e-02   2.3317987967e+05   1.3578748182e+01   9.4183530022e-01
+ 011  1.2674e+02   GS  4.9500186292e+00   2.5531771617e+00   4.3162028462e-01   1.7442244463e-02   2.3315002027e+05   1.3579715608e+01   1.0000000000e+00
+ 012  1.2793e+02   GS  4.4028628053e+00   3.8241158029e-02   4.3161802150e-01   1.7441855701e-02   2.3314879779e+05   1.3579602157e+01   8.8466216659e-01
+----------------------------
+      MDA CONVERGED!        
+----------------------------
+{'cruise_drag': 9421.635532342561, 'cruise_lift': 233148.7977877162, 'cruise_mass': 2709.3602808322757}
+Solving adjoint: drag
+Iter         CPU           Residual 
+ 000  1.3533e+00   3.4822560749e+04
+ 001  9.6855e+00   3.6717964086e+03
+ 002  1.7504e+01   3.5567503338e+03
+ 003  2.5470e+01   5.3010066628e+02
+ 004  3.3505e+01   5.8209351490e+01
+ 005  4.1461e+01   1.9924211522e+00
+ 006  4.9590e+01   3.1939365681e-01
+----------------------------
+      CAD CONVERGED!        
+----------------------------
+Solving adjoint: lift
+Iter         CPU           Residual 
+ 000  1.3796e+00   4.7897929428e+04
+ 001  9.4176e+00   2.9752479805e+04
+ 002  1.7554e+01   2.9589094478e+04
+ 003  2.5485e+01   2.9381367527e+04
+ 004  3.3411e+01   2.6276747330e+04
+ 005  4.1296e+01   4.4050982252e+03
+ 006  5.2478e+01   8.0147296954e+02
+ 007  6.2935e+01   6.9865177704e+01
+ 008  7.0928e+01   1.0927044361e+01
+ 009  7.9126e+01   8.8549885317e-01
+ 010  8.7684e+01   7.8644273910e-02
+----------------------------
+      CAD CONVERGED!        
+----------------------------
+Solving adjoint: mass
+Iter         CPU           Residual 
+ 000  1.3837e+00   0.0000000000e+00
+Computing total derivatives
+No DVGeo Object found, continuing without geometric derivatives
+No DVGeo Object found, continuing without geometric derivatives
+No DVGeo Object found, continuing without geometric derivatives
+{'cruise_drag': {'struct': array([-4.01372495e+02, -6.75798443e+02, -5.17633439e+02, -3.92075972e+01,
+        3.92777696e+01,  2.48381214e+01,  2.04225168e+01,  1.92913181e+01,
+        3.33231407e+01,  4.09293063e+01,  2.82895296e+01,  1.83441045e+01,
+        1.93792965e+01,  1.30585165e+01,  1.75458069e+00, -8.01775028e-01,
+       -3.16179887e+00,  2.44233654e+00,  6.65448709e+02,  3.23062983e+02,
+        4.42200369e+02,  3.62131823e+02,  2.73245260e+02,  1.93959163e+02,
+        1.19306095e+02,  5.77786389e+01,  1.17960304e+01, -4.92436443e+03,
+       -3.12731527e+03, -2.12588715e+03, -1.58967963e+03, -1.26747778e+03,
+       -8.68018707e+02, -4.92214354e+02, -2.11995424e+02, -4.74646262e+01,
+       -7.46693644e+03, -6.54934307e+03, -4.62945523e+03, -2.92385620e+03,
+       -1.69078572e+03, -7.67861164e+02, -1.87520727e+02, -1.97346850e+01,
+       -8.45431082e+03, -7.79005470e+03, -6.70287407e+03, -4.71687437e+03,
+       -3.03850419e+03, -1.75286004e+03, -7.71704218e+02, -2.01144406e+02,
+       -1.29794174e+01, -8.17466857e+03, -1.70241598e+02, -1.66896310e+02,
+       -1.24734496e+02, -8.42799844e+01, -4.57864708e+01, -1.96670889e+01,
+        3.08639797e+00,  2.77146861e+00,  1.54081654e+02, -1.85851535e+02,
+       -1.41110254e+02, -1.01676882e+02, -7.21184457e+01, -3.94931610e+01,
+       -1.57173766e+01,  2.31484547e+00, -2.44284352e+00,  2.34433198e+01,
+       -2.72884239e+02, -2.18345655e+02, -1.64575630e+02, -1.21902040e+02,
+       -8.66141242e+01, -5.56656124e+01, -2.12121874e+01, -1.02049228e+01,
+       -9.40838595e+01, -2.12997809e+02, -2.04810901e+02, -1.54351125e+02,
+       -1.00843645e+02, -5.83380020e+01, -2.67590864e+01, -7.16694412e+00,
+        1.31396855e-01,  1.27058045e+02, -2.20985322e+02, -1.66493284e+02,
+       -1.20949161e+02, -8.06989089e+01, -4.48375647e+01, -1.86333304e+01,
+       -3.01544858e+00,  1.47646816e+00, -3.42051806e+00, -2.07953157e+02,
+       -1.38815320e+02, -9.06509708e+01, -5.60396353e+01, -3.84262492e+01,
+       -1.87200651e+01, -3.93441613e+00, -7.55819158e-01, -2.94952795e+01])}, 'cruise_lift': {'struct': array([-5.86550007e+03, -1.00929135e+04, -8.57817656e+03, -8.23096308e+02,
+        1.69352225e+02, -2.11655053e+02, -2.60489782e+02, -2.28996515e+02,
+        1.21988368e+02,  2.85455736e+02,  3.23230707e+01, -1.51482999e+02,
+       -6.94946580e+01, -1.21643785e+02, -2.37168043e+02, -1.38172378e+02,
+       -4.12866094e+01,  2.72322495e+01,  1.25693529e+04,  5.75391684e+03,
+        7.65500116e+03,  6.23711580e+03,  4.62158779e+03,  3.10131965e+03,
+        1.78475164e+03,  7.57773421e+02,  1.15539052e+02, -9.48675838e+04,
+       -5.84739314e+04, -3.96622051e+04, -2.93922796e+04, -2.30447061e+04,
+       -1.55678233e+04, -8.56656035e+03, -3.51490510e+03, -6.86902119e+02,
+       -1.50171887e+05, -1.28491643e+05, -8.86125437e+04, -5.46723937e+04,
+       -3.07272945e+04, -1.34263682e+04, -3.28852103e+03, -3.23246090e+02,
+       -1.72760409e+05, -1.56278799e+05, -1.31015211e+05, -9.00171649e+04,
+       -5.64370693e+04, -3.16880013e+04, -1.34507144e+04, -3.36386142e+03,
+       -2.26671038e+02, -1.66445414e+05, -3.59397605e+03, -3.34109509e+03,
+       -2.40670522e+03, -1.61114489e+03, -9.34000084e+02, -4.29631231e+02,
+       -1.20575704e+02, -1.99824072e+01,  2.88650961e+03, -3.88990240e+03,
+       -3.06407749e+03, -2.25131150e+03, -1.41329644e+03, -8.00142862e+02,
+       -3.72634648e+02, -1.45442902e+02, -4.06316288e+01, -2.94649663e+02,
+       -5.30355717e+03, -4.24454473e+03, -3.16948747e+03, -2.21777437e+03,
+       -1.54708652e+03, -1.02315800e+03, -3.41941823e+02, -1.14129351e+02,
+       -2.36543866e+03, -4.11194399e+03, -3.83637490e+03, -2.79674369e+03,
+       -1.80015786e+03, -1.02204502e+03, -4.57233103e+02, -1.24891393e+02,
+       -3.53494813e+00,  2.45699072e+03, -4.52910229e+03, -3.38485229e+03,
+       -2.41234869e+03, -1.53532248e+03, -8.40290112e+02, -3.56365453e+02,
+       -7.97449919e+01,  6.21150713e+00, -4.26089285e+02, -4.34348030e+03,
+       -2.90508308e+03, -1.87420396e+03, -1.12875616e+03, -7.42834474e+02,
+       -3.45032985e+02, -6.78622962e+01, -9.97200185e+00, -1.14553730e+03])}, 'cruise_mass': {'struct': array([ 3801.53270578,  3705.41177158,  3390.9753656 ,  3090.44458887,
+        2803.80821527,  2531.06769224,  2272.22190583,  2027.2720084 ,
+        1796.19712059,  1579.01380966,  1375.70819336,  1186.30134169,
+        1010.82484821,   849.26102998,   701.56883877,   567.766255  ,
+         447.85943118,   339.91564513,  1929.21901637,  1642.97862072,
+        1507.31302592,  1371.64751049,  1235.98210301,  1100.31684648,
+         964.65181362,   828.70741065,   690.71109096,  1166.30616021,
+        1500.29302724,  1383.03495716,  1265.77982167,  1148.52395304,
+        1031.16753052,   913.34369178,   795.37285114,   676.41425729,
+       11448.74331507, 10357.90149601,  9267.05981287,  8176.2203349 ,
+        7085.3803636 ,  5994.59927655,  4903.8672441 ,  3813.39994385,
+       11427.38442925, 11476.98089419, 10383.35936219,  9289.74230722,
+        8196.12060358,  7102.4839958 ,  6008.85491851,  4915.26874809,
+        3821.84396854, 11460.98346192,   341.4519894 ,   311.57641637,
+         281.70084777,   251.82528356,   221.94972743,   192.07418135,
+         162.19826704,   132.08615883,   342.97613699,   252.47443421,
+         230.25875886,   208.04193825,   185.80575697,   163.55514538,
+         141.30453554,   119.05392821,    96.70310329,   229.86713473,
+         316.38484912,   289.65254444,   262.92018927,   236.1845503 ,
+         209.38649897,   182.51689356,   155.6379735 ,   128.51310247,
+         266.19190405,   341.4519893 ,   311.57641623,   281.70084768,
+         251.82528347,   221.94972751,   192.07418115,   162.19826712,
+         132.08615882,   342.97613689,   252.4744342 ,   230.25875883,
+         208.04193844,   185.80575709,   163.55514552,   141.30453547,
+         119.05392826,    96.70310325,   229.86713461,   316.3848491 ,
+         289.65254432,   262.9201891 ,   236.18455022,   209.38649896,
+         182.51689365,   155.63797324,   128.5131024 ,   266.19190404])}, 'fail': False}

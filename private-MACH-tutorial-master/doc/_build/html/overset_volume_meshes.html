@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volume Meshing &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Checking the Overset Mesh" href="overset_ihcc.html" />
+    <link rel="prev" title="Geometry and Surface Mesh Generation" href="overset_geom.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overset_geom.html">Geometry and Surface Mesh Generation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Volume Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ihcc.html">Checking the Overset Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_analysis.html">Analysis with ADflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ffds.html">Creating FFD Grids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_opt.html">Optimization with ADflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a> &raquo;</li>
+      <li>Volume Meshing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overset_volume_meshes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="volume-meshing">
+<span id="overset-volume-meshes"></span><h1>Volume Meshing<a class="headerlink" href="#volume-meshing" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<dl class="simple">
+<dt>The objectives of this section are to:</dt><dd><ul class="simple">
+<li><p>generate two separate volume meshes for the front and back wings,</p></li>
+<li><p>generate a background mesh, and</p></li>
+<li><p>combine them.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Here is a view of the symmetry plane (looking in the positive-z direction) for the overset mesh that we want to end up with in this section.</p>
+<a class="reference internal image-reference" href="_images/overset_background_labels.png"><img alt="_images/overset_background_labels.png" src="_images/overset_background_labels.png" style="width: 660.4499999999999px; height: 602.0px;" /></a>
+<p>Once we generate the three meshes, all we need to do is combine them into one CGNS file, and ADflow will take care of the connectivities, interpolation, blanking, and flooding using an implicit hole-cutting algorithm (when we run an analysis or optimization).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TODO: Need to add more background information on overset meshes. In the meantime, see the <code class="docutils literal notranslate"><span class="pre">overset.pdf</span></code> slides in <code class="docutils literal notranslate"><span class="pre">MACHtutorial/tutorial/oversetopt/</span></code>.</p>
+</div>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>Navigate to the directory <code class="docutils literal notranslate"><span class="pre">oversetopt/mesh/volume</span></code> in your tutorial folder.
+Copy the following files from the surface meshing directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cp ../surface/wing.cgns .
+</pre></div>
+</div>
+<p>Create the following empty runscript in the current directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">run_pyhyp.py</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="the-pyhyp-runscript">
+<h2>The pyHyp runscript<a class="headerlink" href="#the-pyhyp-runscript" title="Permalink to this headline"></a></h2>
+<p>Open the file <code class="docutils literal notranslate"><span class="pre">run_pyhyp.py</span></code> with your favorite text editor.
+Then copy the code from each of the following sections into this file.</p>
+<div class="section" id="import-libraries">
+<h3>Import libraries<a class="headerlink" href="#import-libraries" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhyp</span> <span class="kn">import</span> <span class="n">pyHyp</span>
+
+</pre></div>
+</div>
+</div>
+<div class="section" id="options-for-the-front-wing">
+<h3>Options for the front wing<a class="headerlink" href="#options-for-the-front-wing" title="Permalink to this headline"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Front wing vol mesh</span>
+<span class="n">options_front</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   General options</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;inputFile&quot;</span><span class="p">:</span> <span class="s2">&quot;wing.cgns&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fileType&quot;</span><span class="p">:</span> <span class="s2">&quot;CGNS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;unattachedEdgesAreSymmetry&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;outerFaceBC&quot;</span><span class="p">:</span> <span class="s2">&quot;overset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;autoConnect&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;BC&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">&quot;families&quot;</span><span class="p">:</span> <span class="s2">&quot;wing_front&quot;</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Here a few options that are different from the options used earlier in the <span class="xref std std-ref">Volume Meshing</span> tutorial are the <code class="docutils literal notranslate"><span class="pre">outerFaceBC</span></code> and <code class="docutils literal notranslate"><span class="pre">families</span></code> options.
+Instead of using a farfield boundary condition, we set the <code class="docutils literal notranslate"><span class="pre">outerFaceBC</span></code> to <code class="docutils literal notranslate"><span class="pre">overset</span></code>.
+Since we have two wings, we also want to give them different family names that can be used to distinguish between them later for options such as outputting lift distributions from ADflow.
+Next we specify some grid parameters.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Grid Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span>
+    <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mf">3e-5</span><span class="p">,</span>
+    <span class="s2">&quot;marchDist&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+    <span class="s2">&quot;coarsen&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</pre></div>
+</div>
+<p>Here, we specify a relatively small <code class="docutils literal notranslate"><span class="pre">marchDist</span></code> because we only need a small volume mesh around the wing surface for the overset mesh.
+For this example, we also coarsen the surface mesh before extruding using the <code class="docutils literal notranslate"><span class="pre">coarsen</span></code> option.
+Next, we have the algorithm-specific options and commands to generate and output the mesh for the front wing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Pseudo Grid Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;ps0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;pGridRatio&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;cMax&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Smoothing parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;epsE&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;epsI&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+    <span class="s2">&quot;volCoef&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s2">&quot;volBlend&quot;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+    <span class="s2">&quot;volSmoothIter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Solution Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;kspRelTol&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+    <span class="s2">&quot;kspMaxIts&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">&quot;kspSubspaceSize&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">hyp</span> <span class="o">=</span> <span class="n">pyHyp</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options_front</span><span class="p">)</span>
+<span class="n">hyp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">hyp</span><span class="o">.</span><span class="n">writeCGNS</span><span class="p">(</span><span class="s2">&quot;wing_vol_front.cgns&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Next, we create another volume mesh (same surface file and options but with a different family name) that we will use for the back wing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># Back wing vol mesh</span>
+<span class="n">options_back</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   General options</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;inputFile&quot;</span><span class="p">:</span> <span class="s2">&quot;wing.cgns&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fileType&quot;</span><span class="p">:</span> <span class="s2">&quot;cgns&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;unattachedEdgesAreSymmetry&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;outerFaceBC&quot;</span><span class="p">:</span> <span class="s2">&quot;overset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;autoConnect&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;BC&quot;</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">&quot;families&quot;</span><span class="p">:</span> <span class="s2">&quot;wing_back&quot;</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Grid Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">33</span><span class="p">,</span>
+    <span class="s2">&quot;s0&quot;</span><span class="p">:</span> <span class="mf">3e-5</span><span class="p">,</span>
+    <span class="s2">&quot;marchDist&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+    <span class="s2">&quot;coarsen&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Pseudo Grid Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;ps0&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;pGridRatio&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;cMax&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Smoothing parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;epsE&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;epsI&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="s2">&quot;theta&quot;</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+    <span class="s2">&quot;volCoef&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+    <span class="s2">&quot;volBlend&quot;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+    <span class="s2">&quot;volSmoothIter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="c1">#   Solution Parameters</span>
+    <span class="c1"># ---------------------------</span>
+    <span class="s2">&quot;kspRelTol&quot;</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+    <span class="s2">&quot;kspMaxIts&quot;</span><span class="p">:</span> <span class="mi">1500</span><span class="p">,</span>
+    <span class="s2">&quot;kspSubspaceSize&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">hyp</span> <span class="o">=</span> <span class="n">pyHyp</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options_back</span><span class="p">)</span>
+<span class="n">hyp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="n">hyp</span><span class="o">.</span><span class="n">writeCGNS</span><span class="p">(</span><span class="s2">&quot;wing_vol_back.cgns&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<p>You can now run the python file with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python run_pyhyp.py
+</pre></div>
+</div>
+<p>For larger meshes, you will want to run pyHyp as a parallel process.
+This can be done with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpirun -np 4 python run_pyhyp.py
+</pre></div>
+</div>
+<p>where the number of processors is given after <code class="docutils literal notranslate"><span class="pre">-np</span></code>.
+Now you will have two CGNS files: <code class="docutils literal notranslate"><span class="pre">wing_vol_front.cgns</span></code> and <code class="docutils literal notranslate"><span class="pre">wing_vol_back.cgns</span></code>.</p>
+</div>
+<div class="section" id="using-cgns-utils-to-coarsen-the-two-wings">
+<h2>Using cgns_utils to coarsen the two wings<a class="headerlink" href="#using-cgns-utils-to-coarsen-the-two-wings" title="Permalink to this headline"></a></h2>
+<p>Now, to further reduce computational cost for this example, we will coarsen the two volume meshes created so far using cgns_utils with the following two commands in the terminal.
+First the front wing (we will name the new coarsened mesh <code class="docutils literal notranslate"><span class="pre">wing_vol_front_c.cgns</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgns_utils coarsen wing_vol_front.cgns wing_vol_front_c.cgns
+</pre></div>
+</div>
+<p>Then the back wing (we will name the new coarsened mesh <code class="docutils literal notranslate"><span class="pre">wing_vol_back_c.cgns</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgns_utils coarsen wing_vol_back.cgns wing_vol_back_c.cgns
+</pre></div>
+</div>
+<p>Unlike the pyHyp <code class="docutils literal notranslate"><span class="pre">coarsen</span></code> option (which first coarsens the surface mesh and then extrudes the volume mesh), the cgns_util <code class="docutils literal notranslate"><span class="pre">coarsen</span></code> command coarsens the entire volume mesh.</p>
+</div>
+<div class="section" id="using-cgns-utils-to-translate-the-back-wing-and-combine-the-two-wings">
+<h2>Using cgns_utils to translate the back wing and combine the two wings<a class="headerlink" href="#using-cgns-utils-to-translate-the-back-wing-and-combine-the-two-wings" title="Permalink to this headline"></a></h2>
+<p>Next, we will translate the volume mesh created for the back wing so that it is offset by 1 m in the x direction and 0.5 m in the y direction.
+The following simple command is all that is required (in the terminal).
+Here, we first specify the name of the mesh we want to translate, then the x, y, and z displacements, and the name of the translated file.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgns_utils translate wing_vol_back_c.cgns 1 0.5 0 wing_vol_back_c_t.cgns
+</pre></div>
+</div>
+<p>Next, we will use the following command to combine the volume meshes into one cgns file using the following command.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cgns_utils combine wing_vol_front_c.cgns wing_vol_back_c_t.cgns wing_vols_combined.cgns
+</pre></div>
+</div>
+<p>Now if we open <code class="docutils literal notranslate"><span class="pre">wing_vols_combined.cgns</span></code> using Tecplot, it should look like this:</p>
+<a class="reference internal image-reference" href="_images/overset_wings_combined.png"><img alt="_images/overset_wings_combined.png" src="_images/overset_wings_combined.png" style="width: 565.75px; height: 487.0px;" /></a>
+</div>
+<div class="section" id="generating-the-background-mesh">
+<h2>Generating the background mesh<a class="headerlink" href="#generating-the-background-mesh" title="Permalink to this headline"></a></h2>
+<p>We will further use cgns_utils to generate a background mesh around the wing meshes and then combine all the meshes.
+We can use the following script to generate a background mesh.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">cgnsutilities</span> <span class="kn">import</span> <span class="n">cgnsutilities</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;inFile&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;outFile&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="c1"># Generate background mesh</span>
+<span class="n">wingGrid</span> <span class="o">=</span> <span class="n">cgnsutilities</span><span class="o">.</span><span class="n">readGrid</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">inFile</span><span class="p">)</span>
+
+<span class="n">dh</span> <span class="o">=</span> <span class="mf">0.04</span>
+<span class="n">hExtra</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="mf">0.64</span>
+<span class="n">nExtra</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">sym</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span>
+<span class="n">mgcycle</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">backgroundFile</span> <span class="o">=</span> <span class="s2">&quot;background_tandem.cgns&quot;</span>
+
+<span class="n">wingGrid</span><span class="o">.</span><span class="n">simpleOCart</span><span class="p">(</span><span class="n">dh</span><span class="p">,</span> <span class="n">hExtra</span><span class="p">,</span> <span class="n">nExtra</span><span class="p">,</span> <span class="n">sym</span><span class="p">,</span> <span class="n">mgcycle</span><span class="p">,</span> <span class="n">backgroundFile</span><span class="p">)</span>
+<span class="n">backgroundGrid</span> <span class="o">=</span> <span class="n">cgnsutilities</span><span class="o">.</span><span class="n">readGrid</span><span class="p">(</span><span class="n">backgroundFile</span><span class="p">)</span>
+
+<span class="c1"># Combine background grid with wing meshes</span>
+<span class="n">oversetGrid</span> <span class="o">=</span> <span class="n">cgnsutilities</span><span class="o">.</span><span class="n">combineGrids</span><span class="p">([</span><span class="n">backgroundGrid</span><span class="p">,</span> <span class="n">wingGrid</span><span class="p">],</span> <span class="n">useOldNames</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">oversetGrid</span><span class="o">.</span><span class="n">writeToCGNS</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">outFile</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">wingGrid.simpleOCart()</span></code> creates a Cartesian grid around the specified volume meshes (our wings in this case) and then marches layers off the cartesion grid to generate an O grid.
+The option <code class="docutils literal notranslate"><span class="pre">dh</span></code> specifies the size of the Cartesian cells (this has to be set, sometimes using trial and error, to an appropriate size that allows a valid hole cutting).
+The <code class="docutils literal notranslate"><span class="pre">hExtra</span></code> option specifies the march distance from the Cartesian grid (20 half-span lengths in this example).
+The <code class="docutils literal notranslate"><span class="pre">nExtra</span></code> option specifies the number of layers for the grid marched off the Cartesian grid.
+The <code class="docutils literal notranslate"><span class="pre">sym</span></code> option specifies the symmetry plane axis.
+The <code class="docutils literal notranslate"><span class="pre">mgcycle</span></code> option specifies how many times the Cartesian grid should be able to be coarsened for multigrid cycles.
+Finally, the <code class="docutils literal notranslate"><span class="pre">cgnsutilities.combineGrids()</span></code> function combines the background mesh with the given volume meshes.</p>
+</div>
+<div class="section" id="id1">
+<h2>Run it yourself!<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
+<p>You can now run the python file with the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python generate_overset.py wing_vols_combined.cgns overset_combined.cgns
+</pre></div>
+</div>
+<p>In Tecplot, with translucency, <code class="docutils literal notranslate"><span class="pre">overset_combined.cgns</span></code> should look like the following images.</p>
+<a class="reference internal image-reference" href="_images/overset_combined_trans.png"><img alt="_images/overset_combined_trans.png" src="_images/overset_combined_trans.png" style="width: 568.75px; height: 505.25px;" /></a>
+<a class="reference internal image-reference" href="_images/overset_combined_trans_zoom.png"><img alt="_images/overset_combined_trans_zoom.png" src="_images/overset_combined_trans_zoom.png" style="width: 566.0px; height: 501.5px;" /></a>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overset_geom.html" class="btn btn-neutral float-left" title="Geometry and Surface Mesh Generation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overset_ihcc.html" class="btn btn-neutral float-right" title="Checking the Overset Mesh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

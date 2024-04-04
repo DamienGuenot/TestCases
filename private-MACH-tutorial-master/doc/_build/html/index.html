@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MACH Tutorial &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Structural Analysis" href="struct_overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>MACH Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="mach-tutorial">
+<span id="intro"></span><h1>MACH Tutorial<a class="headerlink" href="#mach-tutorial" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>This is the private tutorials page that contains MACH Aerostructural tutorials and advanced MACH-Aero tutorials.
+The publicly available tutorials are located in the <span class="xref std std-doc">MACH-Aero repo</span>.
+If you are new to MACH, start with the publicly available tutorials.</p>
+<p>The files for these additional tutorials are located on <a class="reference external" href="https://github.com/mdolab/private-MACH-tutorial/">GitHub</a>.
+The scripts referenced in the tutorial can be found in the tutorial directory.
+The files for the overset meshing tutorial are in the <code class="docutils literal notranslate"><span class="pre">overset</span></code> directory.
+The run files for structural and aerostructural optimization, including the geometry and aerodynamic loads generation, are located in the <code class="docutils literal notranslate"><span class="pre">wing</span></code> directory.
+We store the input meshes and files in the <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> folder, and the shared modules setup files in <code class="docutils literal notranslate"><span class="pre">SETUP</span></code> folder within <code class="docutils literal notranslate"><span class="pre">wing</span></code>.
+All the scripts from this section live in the same folder to minimize code duplication, but they are all independent from each other and only need the appropriate setup and input files to run, as illustrated in the following pages.
+Although these scripts should be executable without any modifications, <strong>we highly recommend that you create a separate directory and type out the lines of code by yourself.</strong>
+As you do this, ask yourself, “Do I understand why the code is written this way?”
+This will result in a much deeper understanding of how to use the tools and eventually will help you develop code in a consistent manner.
+It is up to the user to define their own directory tree, but we strongly recommend to keep the setup and input files in separate folders for a cleaner layout.</p>
+<p>Before continuing with the tutorial, make sure that the MDO Lab framework is already installed on your machine, following the instructions for <span class="xref std std-ref">mach-aero:installfromscratch</span>.</p>
+</div>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="struct_pylayout.html">Wingbox Geometry and Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_load.html">Aerodynamic Loads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_analysis.html">Structural analysis with TACS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="opt_struct.html">Structural Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opt_aerostruct.html">Aerostructural Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="overset_geom.html">Geometry and Surface Mesh Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_volume_meshes.html">Volume Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ihcc.html">Checking the Overset Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_analysis.html">Analysis with ADflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ffds.html">Creating FFD Grids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_opt.html">Optimization with ADflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="required-software">
+<h2>Required Software<a class="headerlink" href="#required-software" title="Permalink to this headline"></a></h2>
+<p><strong>Made in the MDOlab</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/mdolab/adflow">ADflow</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pygeo">pyGeo</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pyspline">pySpline</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pyhyp">pyHyp</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/idwarp">IDWarp</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pylayout">pyLayout</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/tacs_orig">TACS</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pytacs">pyTACS</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pyoptsparse">pyOptSparse</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/cgnsutilities">cgnsUtilities</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/baseclasses">baseclasses</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/pyaerostructure">pyAeroStructure</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mdolab/multipoint">multipoint</a></p></li>
+</ul>
+<p>Note: These links take you to the GitHub repositories.
+The documentation site for each package is listed in the README of each GitHub repository.</p>
+<p><strong>External Software</strong></p>
+<ul class="simple">
+<li><p>ICEM CFD</p></li>
+<li><p>Tecplot (for visualization)</p></li>
+</ul>
+</div>
+<div class="section" id="documentation-strategy">
+<h2>Documentation strategy<a class="headerlink" href="#documentation-strategy" title="Permalink to this headline"></a></h2>
+<p>The tutorial resides on <a class="reference external" href="https://github.com/mdolab/private-MACH-tutorial/">GitHub</a>, but it is a living tutorial, which means that it is constantly updated with corrections and improvements.
+We invite you, especially as a new user, to take notes of the parts that you find confusing and bring them to the attention of an admin to the tutorial repository so that changes can be made.</p>
+<p>The rst files in the doc directory contain direct links to the python scripts in the tutorial directory to avoid code duplication.
+This is done using the <code class="docutils literal notranslate"><span class="pre">start-after</span></code> and <code class="docutils literal notranslate"><span class="pre">end-before</span></code> options of Sphinx’s native <code class="docutils literal notranslate"><span class="pre">literalinclude</span></code> directive.
+We adopt the convention of using <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">rst</span> <span class="pre">&lt;section</span> <span class="pre">subject&gt;</span></code> as the marker for the start and end of each <code class="docutils literal notranslate"><span class="pre">literalinclude</span></code> section, like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># rst Simple addition (begin)</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="c1"># rst Simple addition (end)</span>
+</pre></div>
+</div>
+<p>Please adopt this same convention for any future developments to the tutorial.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="struct_overview.html" class="btn btn-neutral float-right" title="Structural Analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

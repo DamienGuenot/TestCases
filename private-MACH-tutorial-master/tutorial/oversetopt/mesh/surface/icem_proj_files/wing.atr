@@ -1,0 +1,25 @@
+# Written by ICEM CFD 14.0, user sschau, Mon Mar 18 07:20:02 PM EDT 2019
+
+begin family WING
+    begin solver "CGNS"
+    end solver "CGNS"
+end family WING
+
+begin family SOLID
+    begin solver "CGNS"
+        begin bctype color
+            active 1
+            color 3403130 1
+        end bctype color
+    end solver "CGNS"
+end family SOLID
+
+begin family DEFAULT_EDGE
+    begin solver "CGNS"
+    end solver "CGNS"
+end family DEFAULT_EDGE
+
+begin family DEFAULT_VERTEX
+    begin solver "CGNS"
+    end solver "CGNS"
+end family DEFAULT_VERTEX

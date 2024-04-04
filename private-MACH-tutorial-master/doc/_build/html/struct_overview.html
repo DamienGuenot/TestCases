@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Structural Analysis &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Wingbox Geometry and Meshing" href="struct_pylayout.html" />
+    <link rel="prev" title="MACH Tutorial" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Structural Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="struct_pylayout.html">Wingbox Geometry and Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_load.html">Aerodynamic Loads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_analysis.html">Structural analysis with TACS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Structural Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/struct_overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="structural-analysis">
+<span id="struct-overview"></span><h1>Structural Analysis<a class="headerlink" href="#structural-analysis" title="Permalink to this headline"></a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline"></a></h2>
+<p>TACS is the Toolkit for Analysis of Composite Structures written in C++.
+This tutorial will help you use pyTACS, the Python interface for TACS.</p>
+<ul class="simple">
+<li><p>Solution types: linear static, nonlinear static, buckling</p></li>
+<li><p>Elements: beams, shells, volumes</p></li>
+</ul>
+<p>TACS supports structural model data in the Nastran Bulk Data File (BDF) format.
+A typical BDF file contains grid points, elements, element properties, boundary conditions, and load conditions.
+The MeshLoader class in TACS will read in data for grid points, elements, and boundary conditions, but the element properties and load conditions must be formulated in the Python runscript.</p>
+<p>Elements are the most basic functional group in TACS.
+Each element is linked to its neighbors via the connectivity matrix.
+Each element belongs to a component as well.
+Components are made up of groups of elements that have the same property ID (PID) in the BDF file.</p>
+</div>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="struct_pylayout.html">Wingbox Geometry and Meshing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="struct_load.html">Aerodynamic Loads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="struct_analysis.html">Structural analysis with TACS</a></li>
+</ul>
+</div>
+<div class="section" id="output-file">
+<h3>Output file<a class="headerlink" href="#output-file" title="Permalink to this headline"></a></h3>
+<p>To visualize the solution, the <code class="docutils literal notranslate"><span class="pre">.f5</span></code> file must be converted to a <code class="docutils literal notranslate"><span class="pre">.plt</span></code> (Tecplot file). Use the <code class="docutils literal notranslate"><span class="pre">f5totec</span></code> command in the terminal.</p>
+<p>What outputs are in the file?</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>u0, v0, w0, rotx, roty, roty</strong></dt><dd><p>6 DOF displacements at each node</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>ex0, ey0, exy0, exz0, eyz0</strong></dt><dd><p>Mid-plane shell strains</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>ex1, ey1, exy1</strong></dt><dd><p>Shell curvature/through thickness strain gradient</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>sx0, sy0, sxy0, sxz0, sxy0</strong></dt><dd><p>Mid-plane stress resultants, (force/length)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>sx1, sy1, sxy1</strong></dt><dd><p>Moment resultants, (moment/length)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>These outputs are a little confusing but they relate to the constitutive models we use for modelling shells in TACS.
+These models rely on Mindlin-Reissner plate theory, also known as First-order Shear Deformation Theory (hence the FSDT in the <cite>isoFSDT</cite> and <cite>bladeFSDT</cite> constitutive model names).
+This theory is essentially the plate equivalent of Euler-Bernoulli beam theory and assumes that the in plane strains vary linearly through the thickness of the shell.
+The in-plane strains at a given height z from the shell mid-plane is then:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix} \epsilon_x(z) \\ \epsilon_y(z) \\ \gamma_{xy}(z) \end{bmatrix} = \begin{bmatrix} \epsilon_x^0 \\ \epsilon_y^0 \\ \gamma_{xy}^0 \end{bmatrix} + z \begin{bmatrix} \epsilon_x^1 \\ \epsilon_y^1 \\ \gamma_{xy}^1 \end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>lambda, buckling</strong></dt><dd><p>Failure and buckling constraints (value &gt; 1 means the constraint is violated)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>TACS uses different failure criteria for different materials.
+For isotropic materials it uses the Von-Mises stress criterion and for composites it can either use a maximum strain or Tsai-Wu criterion.
+At any given point in the structure, TACS computes these criteria at the upper and lower surfaces of the shell and, if using the <cite>bladeFSDT</cite> constitutive model, the tip of the blade stiffener.
+The maximum of these values is then returned as the failure value for that point.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="MACH Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="struct_pylayout.html" class="btn btn-neutral float-right" title="Wingbox Geometry and Meshing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

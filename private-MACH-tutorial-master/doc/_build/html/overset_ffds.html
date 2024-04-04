@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating FFD Grids &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Optimization with ADflow" href="overset_opt.html" />
+    <link rel="prev" title="Analysis with ADflow" href="overset_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overset_geom.html">Geometry and Surface Mesh Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_volume_meshes.html">Volume Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_ihcc.html">Checking the Overset Mesh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_analysis.html">Analysis with ADflow</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating FFD Grids</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overset_opt.html">Optimization with ADflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a> &raquo;</li>
+      <li>Creating FFD Grids</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overset_ffds.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="creating-ffd-grids">
+<span id="overset-ffds"></span><h1>Creating FFD Grids<a class="headerlink" href="#creating-ffd-grids" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>Before moving on to the optimization runscript, we need to create FFD grids.
+We will use a similar custom script to the one used in the <span class="xref std std-ref">mach-aero:opt_ffd</span> tutorial.</p>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>Navigate to the directory <code class="docutils literal notranslate"><span class="pre">oversetopt/ffd</span></code> in your tutorial folder.
+Create the following empty runscript in the current directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tandem_ffds.py</span></code></p></li>
+</ul>
+</div>
+<div class="section" id="custom-runscript-to-create-ffd-grids">
+<h2>Custom runscript to create FFD grids<a class="headerlink" href="#custom-runscript-to-create-ffd-grids" title="Permalink to this headline"></a></h2>
+<p>Open the file <code class="docutils literal notranslate"><span class="pre">tandem_ffds.py</span></code> with your favorite text editor.
+Then copy the following code blocks into this file.</p>
+<p>First we will create a grid around the front wing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="c1"># Front wing</span>
+<span class="c1"># Bounding box for root airfoil</span>
+<span class="n">x_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">]</span>
+<span class="n">y_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span>
+<span class="n">z_root</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.01</span>
+
+<span class="c1"># Bounding box for tip airfoil</span>
+<span class="n">x_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">]</span>
+<span class="n">y_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">]</span>
+<span class="n">z_tip</span> <span class="o">=</span> <span class="mf">0.67</span>
+
+<span class="c1"># Number of FFD control points per dimension</span>
+<span class="n">nX</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># streamwise</span>
+<span class="n">nY</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># perpendicular to wing planform</span>
+<span class="n">nZ</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># spanwise</span>
+
+<span class="c1"># Compute grid points</span>
+<span class="n">span_dist</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nZ</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.8</span>
+<span class="n">z_sections</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">z_tip</span> <span class="o">-</span> <span class="n">z_root</span><span class="p">)</span> <span class="o">+</span> <span class="n">z_root</span>
+
+<span class="n">x_te</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">x_le</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nZ</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nY</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_te</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">x_le</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">nX</span><span class="p">)</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_coords</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">Z</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">z_sections</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Write FFD to file</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;ffd_front_wing.xyz&quot;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nX</span><span class="p">,</span> <span class="n">nY</span><span class="p">,</span> <span class="n">nZ</span><span class="p">))</span>
+<span class="k">for</span> <span class="nb">set</span> <span class="ow">in</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vals</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</pre></div>
+</div>
+<p>Then we will use the same approach to create a grid for the back wing.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># displacement of the back wing relative to the front wing</span>
+<span class="n">delta_x</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">delta_y</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c1"># Bounding box for root airfoil</span>
+<span class="n">x_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mf">0.27</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">]</span>
+<span class="n">y_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">]</span>
+<span class="n">z_root</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.01</span>
+
+<span class="c1"># Bounding box for tip airfoil</span>
+<span class="n">x_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">,</span> <span class="mf">0.27</span> <span class="o">+</span> <span class="n">delta_x</span><span class="p">]</span>
+<span class="n">y_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span><span class="p">]</span>
+<span class="n">z_tip</span> <span class="o">=</span> <span class="mf">0.67</span>
+
+<span class="c1"># Number of FFD control points per dimension</span>
+<span class="n">nX</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># streamwise</span>
+<span class="n">nY</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># perpendicular to wing planform</span>
+<span class="n">nZ</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># spanwise</span>
+
+<span class="c1"># Compute grid points</span>
+<span class="n">span_dist</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nZ</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.8</span>
+<span class="n">z_sections</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">z_tip</span> <span class="o">-</span> <span class="n">z_root</span><span class="p">)</span> <span class="o">+</span> <span class="n">z_root</span>
+
+<span class="n">x_te</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">x_le</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nZ</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nY</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_te</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">x_le</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">nX</span><span class="p">)</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_coords</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">Z</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">z_sections</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Write FFD to file</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;ffd_back_wing.xyz&quot;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nX</span><span class="p">,</span> <span class="n">nY</span><span class="p">,</span> <span class="n">nZ</span><span class="p">))</span>
+<span class="k">for</span> <span class="nb">set</span> <span class="ow">in</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vals</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</pre></div>
+</div>
+<p>Finally, we will create a large grid that envelops the two grids created for the wings.
+Later, in the optimization runscript, we will set the wing FFDs as children FFDs to this larger parent FFD.
+This approach is used because ADflow only accepts one DVGeometry object.
+This parent grid must be large enough that the child FFD grid points stay inside it, and it only needs to be 8 corner points.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="c1"># some extra space for the outer parent FFD</span>
+<span class="n">extra_space</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># Bounding box for root</span>
+<span class="n">x_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span> <span class="o">-</span> <span class="n">extra_space</span><span class="p">,</span> <span class="mf">0.27</span> <span class="o">+</span> <span class="n">delta_x</span> <span class="o">+</span> <span class="n">extra_space</span><span class="p">]</span>
+<span class="n">y_root_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span> <span class="o">-</span> <span class="n">extra_space</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span> <span class="o">+</span> <span class="n">extra_space</span><span class="p">]</span>
+<span class="n">z_root</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.01</span> <span class="o">-</span> <span class="n">extra_space</span>
+
+<span class="c1"># Bounding box for tip</span>
+<span class="n">x_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.02</span> <span class="o">-</span> <span class="n">extra_space</span><span class="p">,</span> <span class="mf">0.27</span> <span class="o">+</span> <span class="n">delta_x</span> <span class="o">+</span> <span class="n">extra_space</span><span class="p">]</span>
+<span class="n">y_tip_range</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.05</span> <span class="o">-</span> <span class="n">extra_space</span><span class="p">,</span> <span class="mf">0.05</span> <span class="o">+</span> <span class="n">delta_y</span> <span class="o">+</span> <span class="n">extra_space</span><span class="p">]</span>
+<span class="n">z_tip</span> <span class="o">=</span> <span class="mf">0.67</span> <span class="o">+</span> <span class="n">extra_space</span>
+
+<span class="c1"># Number of FFD control points per dimension</span>
+<span class="n">nX</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># streamwise</span>
+<span class="n">nY</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># perpendicular to wing planform</span>
+<span class="n">nZ</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># spanwise</span>
+
+<span class="c1"># Compute grid points</span>
+<span class="n">span_dist</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nZ</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.8</span>
+<span class="n">z_sections</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">z_tip</span> <span class="o">-</span> <span class="n">z_root</span><span class="p">)</span> <span class="o">+</span> <span class="n">z_root</span>
+
+<span class="n">x_te</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">x_le</span> <span class="o">=</span> <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">x_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">x_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">y_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">span_dist</span> <span class="o">*</span> <span class="p">(</span><span class="n">y_tip_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">y_root_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nY</span> <span class="o">*</span> <span class="n">nZ</span><span class="p">,</span> <span class="n">nX</span><span class="p">))</span>
+<span class="n">row</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nZ</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nY</span><span class="p">):</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x_te</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">x_le</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">nX</span><span class="p">)</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_coords</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">Z</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nX</span><span class="p">)</span> <span class="o">*</span> <span class="n">z_sections</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Write FFD to file</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;ffd_parent.xyz&quot;</span>
+<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="s2">1</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\t\t</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nX</span><span class="p">,</span> <span class="n">nY</span><span class="p">,</span> <span class="n">nZ</span><span class="p">))</span>
+<span class="k">for</span> <span class="nb">set</span> <span class="ow">in</span> <span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\t</span><span class="si">%3.8f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">vals</span><span class="p">)</span>
+<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<p>Run the script:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python tandem_ffds.py
+</pre></div>
+</div>
+<p>Loading the three grids in Tecplot should look something like this with translucency.</p>
+<a class="reference internal image-reference" href="_images/overset_ffds.png"><img alt="_images/overset_ffds.png" src="_images/overset_ffds.png" style="width: 582.0px; height: 508.0px;" /></a>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overset_analysis.html" class="btn btn-neutral float-left" title="Analysis with ADflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="overset_opt.html" class="btn btn-neutral float-right" title="Optimization with ADflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wingbox Geometry and Meshing &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Aerodynamic Loads" href="struct_load.html" />
+    <link rel="prev" title="Structural Analysis" href="struct_overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="struct_overview.html">Structural Analysis</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Wingbox Geometry and Meshing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_load.html">Aerodynamic Loads</a></li>
+<li class="toctree-l2"><a class="reference internal" href="struct_analysis.html">Structural analysis with TACS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="struct_overview.html">Structural Analysis</a> &raquo;</li>
+      <li>Wingbox Geometry and Meshing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/struct_pylayout.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="wingbox-geometry-and-meshing">
+<span id="struct-geo"></span><h1>Wingbox Geometry and Meshing<a class="headerlink" href="#wingbox-geometry-and-meshing" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>The purpose of pyLayout is to generate a surface representation of a conventional wingbox geometry that conforms to the shape and size of the desired wing.
+This surface representation can then be meshed in pyLayout or in ICEM, depending on preference and the complexity of the wingbox structure.</p>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>In this section we refer to the <code class="docutils literal notranslate"><span class="pre">generate_wingbox.py</span></code> file, which uses <code class="docutils literal notranslate"><span class="pre">wing.igs</span></code> geometry file from <code class="docutils literal notranslate"><span class="pre">INPUT</span></code> folder.</p>
+</div>
+<div class="section" id="dissecting-the-pylayout-script">
+<h2>Dissecting the pyLayout script<a class="headerlink" href="#dissecting-the-pylayout-script" title="Permalink to this headline"></a></h2>
+<p>To begin, we need to import a few modules.</p>
+<p>And define the wingbox characteristics.</p>
+<p>The bulk of the script is devoted to creating data to initialize the creation of the wingbox geometry.
+It will make more sense if we start at the end of the script to see what we need to provide.</p>
+<p>The first parameter required to initialize pyLayout is a pyGeo object.
+The pyGeo object provides a surface representation of the wing outer mold line (OML) which will be used to ensure that the wingbox fits the wing.</p>
+<div class="section" id="wingbox-layout">
+<h3>Wingbox Layout<a class="headerlink" href="#wingbox-layout" title="Permalink to this headline"></a></h3>
+<p>The rest of the information provided to pyLayout determine the placement of the ribs, spars, and stringers within the wing OML.
+Conveniently, the conventional wingbox is basically arranged like a grid, with ribs intersecting spars and stringers at basically perpendicular junctions.
+These intersections between ribs, spars, and stringers are provided to pyLayout in the <code class="docutils literal notranslate"><span class="pre">X</span></code> parameter, which is a 3D array of shape ncols x nrows x 3.
+The columns (of ncols) are aligned with the ribs, whereas the rows (of nrows) are aligned with the spars and stringers.
+The upper and lower skins conform to the wing OML and cover the extent of the rib/spar structure.</p>
+<p>With no further information given, pyLayout would create a grid structure with ribs at every column and spars along every row.
+We can blank out certain rows and columns to remove ribs, spars, and stringers using the blanking arrays.
+These arrays contain a 1 if the structure should be created a certain location in the grid or a 0 if not.
+For example, the <code class="docutils literal notranslate"><span class="pre">ribBlank</span></code> array:</p>
+<p>This array contains a 1 for every cell of the grid except those in the first column, which tells pyLayout not to place a rib at the wing root.
+The other blanking arrays stipulate spars only on the first and last row, and stringers on every other row.</p>
+</div>
+<div class="section" id="mesh-refinement">
+<h3>Mesh Refinement<a class="headerlink" href="#mesh-refinement" title="Permalink to this headline"></a></h3>
+<p>The number of elements created from this surface representation is determined by the <code class="docutils literal notranslate"><span class="pre">ribSpace</span></code>, <code class="docutils literal notranslate"><span class="pre">spanSpace</span></code>, <code class="docutils literal notranslate"><span class="pre">vSpace</span></code>, <code class="docutils literal notranslate"><span class="pre">stringerSpace</span></code>, and <code class="docutils literal notranslate"><span class="pre">ribStiffenerSpace</span></code> parameters.
+These parameters dictate how many elements should be created from each cell of the <code class="docutils literal notranslate"><span class="pre">X</span></code> matrix along each of the topological axes.
+The stringer height parameters can be used to control the maximum and minimum heights of the stringers.</p>
+</div>
+<div class="section" id="file-output">
+<h3>File output<a class="headerlink" href="#file-output" title="Permalink to this headline"></a></h3>
+<p>pyLayout can output BDF files and Tecplot files for easy visualization</p>
+</div>
+</div>
+<div class="section" id="run-it-yourself">
+<h2>Run it yourself!<a class="headerlink" href="#run-it-yourself" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python generate_wingbox.py
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="struct_overview.html" class="btn btn-neutral float-left" title="Structural Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="struct_load.html" class="btn btn-neutral float-right" title="Aerodynamic Loads" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

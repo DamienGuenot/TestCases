@@ -1,0 +1,8 @@
+# family_boco file written by ICEM CFD by sschau on Mon Mar 18 07:20:02 PM EDT 2019
+## solver CGNS
+"WING"
+"SOLID"
+"SOLID" "color" 3403130
+"DEFAULT_EDGE"
+"DEFAULT_VERTEX"
+

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Structural Optimization &mdash; MACH tutorial  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Aerostructural Optimization" href="opt_aerostruct.html" />
+    <link rel="prev" title="Structural and Aerostructural Optimization" href="opt_overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> MACH tutorial
+            <img src="_static/MDO_Lab_logo_RTD.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="struct_overview.html">Structural Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aerostruct_analysis.html">Aerostructural analysis with ADflow and TACS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="opt_overview.html">Structural and Aerostructural Optimization</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Structural Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="opt_aerostruct.html">Aerostructural Optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="overset_overview.html">Aerodynamic Analysis and Optimization with Overset Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="opt_check_list.html">Pre-run checklists and troubleshooting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MACH tutorial</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="opt_overview.html">Structural and Aerostructural Optimization</a> &raquo;</li>
+      <li>Structural Optimization</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/opt_struct.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="structural-optimization">
+<span id="opt-struct"></span><h1>Structural Optimization<a class="headerlink" href="#structural-optimization" title="Permalink to this headline"></a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h2>
+<p>In this section we will walk through the structural optimization runscript.
+Most of the code is shared with the structural analysis file discussed in <a class="reference internal" href="struct_analysis.html#struct-analysis"><span class="std std-ref">Structural analysis with TACS</span></a>, so be sure to have understood and tried it before moving on to optimization.</p>
+<p>Here, we perform a single-point mass minimization problem subject to stress constraints.
+The exact problem formulation is</p>
+<div class="line-block">
+<div class="line"><em>minimize</em></div>
+<div class="line-block">
+<div class="line">structural mass <span class="math notranslate nohighlight">\(m\)</span></div>
+</div>
+<div class="line"><em>with respect to</em></div>
+<div class="line-block">
+<div class="line">108 panel thicknesses</div>
+</div>
+<div class="line"><em>subject to</em></div>
+<div class="line-block">
+<div class="line">stress constraints <span class="math notranslate nohighlight">\(\mathrm{KS} \le 1.0\)</span></div>
+</div>
+</div>
+<p>The sparsity structure of the constraint Jacobian for this problem is very simple and dense since all the structural design variables are in one group, on which all our constraints depend:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+-------------------------------------------------------------------------------+</span>
+<span class="o">|</span>                   <span class="n">Sparsity</span> <span class="n">structure</span> <span class="n">of</span> <span class="n">constraint</span> <span class="n">Jacobian</span>                   <span class="o">|</span>
+<span class="o">+-------------------------------------------------------------------------------+</span>
+                              <span class="n">struct</span> <span class="p">(</span><span class="mi">108</span><span class="p">)</span>
+                            <span class="o">+--------------+</span>
+    <span class="mf">2.5</span><span class="n">g_USkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>
+                            <span class="o">----------------</span>
+    <span class="mf">2.5</span><span class="n">g_LSkinKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>
+                            <span class="o">----------------</span>
+   <span class="mf">2.5</span><span class="n">g_LESparKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>
+                            <span class="o">----------------</span>
+   <span class="mf">2.5</span><span class="n">g_TESparKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>
+                            <span class="o">----------------</span>
+      <span class="mf">2.5</span><span class="n">g_RibKSFailure</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">|</span>       <span class="n">X</span>      <span class="o">|</span>
+                            <span class="o">+--------------+</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="files">
+<h2>Files<a class="headerlink" href="#files" title="Permalink to this headline"></a></h2>
+<p>The run file we use in this section is <code class="docutils literal notranslate"><span class="pre">struct_opt.py</span></code>, with the same input and setup files used in the <a class="reference internal" href="struct_analysis.html#struct-analysis"><span class="std std-ref">structural analysis</span></a> section.</p>
+</div>
+<div class="section" id="dissecting-the-structural-optimization-script">
+<h2>Dissecting the structural optimization script<a class="headerlink" href="#dissecting-the-structural-optimization-script" title="Permalink to this headline"></a></h2>
+<div class="section" id="setting-up-tacs">
+<h3>Setting up TACS<a class="headerlink" href="#setting-up-tacs" title="Permalink to this headline"></a></h3>
+<p>This part of the code is almost identical to the analysis code, we are setting the aero and gravity loads, without the additional tip and distributed loads.
+Additionally, we are adding a set of adjacency constraints, in this case we are constraining all adjacency panels in the skins, spars and stringers to be within 5mm of any adjacent panels.
+Note that we are applying these constraints <strong>across</strong> all three component groups, meaning that adjacent panels from different groups must still satisfy the adjacency constraints.
+If we called <cite>addAdjacencyConstraints</cite> 3 separate times (once each for skins, spars and stringers) then the constraints would only apply <strong>within</strong> each group, i.e a stringer could differ in thickness from the adjacent skin panel by more than 5mm.
+Adjacency constraints can be very effective in making the optimisation problem easier for SNOPT to solve as they significantly reduce the design space (even when they do not actually constrain your optimised design much), they are also passed to pyOptSparse as linear constraints which can be handled very efficiently, they require no additional gradient evaluations and many optimisers can guarantee they will be satisfied at every iteration.</p>
+</div>
+<div class="section" id="defining-the-functions-and-the-sensitivities">
+<h3>Defining the functions and the sensitivities<a class="headerlink" href="#defining-the-functions-and-the-sensitivities" title="Permalink to this headline"></a></h3>
+<p>Here we take a slightly different approach from what is done in the aerodynamic and aerostructural optimization scripts.
+Since this is a single-point optimization problem, we don’t need to use the <code class="docutils literal notranslate"><span class="pre">multipoint</span></code> package.
+Recall that with <code class="docutils literal notranslate"><span class="pre">multipoint</span></code>, you would define <code class="docutils literal notranslate"><span class="pre">cruiseFuncs</span></code> and <code class="docutils literal notranslate"><span class="pre">cruiseSens</span></code>, and similar for the maneuver point.
+These functions are associated with each processor set and are called only on those processors to evaluate the functions and sensitivities.
+Then, at the end, there is another function called <code class="docutils literal notranslate"><span class="pre">objCon</span></code> which is used to combine those values from different points to obtain the objective and constraints, together with their sensitivities and pass those to the optimizer.</p>
+<p>Here, because we only have one point, we don’t have to rely on <code class="docutils literal notranslate"><span class="pre">multipoint</span></code> and instead can directly use the native pyOptSparse format for passing values.
+We define the function <code class="docutils literal notranslate"><span class="pre">obj</span></code> which computes all objectives and constraints, and the function <code class="docutils literal notranslate"><span class="pre">sens</span></code> for computing their sensitivities.
+Note that these are analogous to the internal function <code class="docutils literal notranslate"><span class="pre">MP.obj</span></code> and <code class="docutils literal notranslate"><span class="pre">MP.sens</span></code> passed to <code class="docutils literal notranslate"><span class="pre">pyOptSparse</span></code> when using <code class="docutils literal notranslate"><span class="pre">multipoint</span></code>.</p>
+<p>Something of importance here is that we define two different lists of functions to be evaluated, <code class="docutils literal notranslate"><span class="pre">dispFuncs</span></code> and <code class="docutils literal notranslate"><span class="pre">objConFuncs</span></code>.
+<code class="docutils literal notranslate"><span class="pre">dispFuncs</span></code> are all the functions we want to keep track of during the optimization, here we include all the functions defined in the structural setup script and then pass this list to the structural problem through the <code class="docutils literal notranslate"><span class="pre">evalFuncs</span></code> argument.
+This means that TACS will compute and return all these functions by default when <code class="docutils literal notranslate"><span class="pre">FEASolver.evalFunctions</span></code> is called in the <code class="docutils literal notranslate"><span class="pre">obj</span></code> function at each function evaluation during the optimization and they will all be stored in the optimization history file.</p>
+<p>On the other hand, <code class="docutils literal notranslate"><span class="pre">objConFuncs</span></code> only contains the functions that are used in the optimization objective and constraint functions, and that we therefore need to compute derivatives of.
+We therefore only include the total wingbox mass function, and the KS Failure functions.
+When we call <code class="docutils literal notranslate"><span class="pre">FEASolver.evalFunctionsSens</span></code> inside the <code class="docutils literal notranslate"><span class="pre">sens</span></code> function, we then pass in <code class="docutils literal notranslate"><span class="pre">objConFuncs</span></code> as the <code class="docutils literal notranslate"><span class="pre">evalFuncs</span></code> argument to avoid wasting time computing the derivatives of the <code class="docutils literal notranslate"><span class="pre">dispFuncs</span></code> that are not involved in the optimization.</p>
+<p>Finally, notice that we include a bit of code to print out all the various mass and failure function values ina nice format at each function evaluation.
+This is very useful for getting an idea of how the optimization is progressing without having to open up optView.</p>
+</div>
+<div class="section" id="setting-up-and-running-the-optimization-problem">
+<h3>Setting up and running the optimization problem<a class="headerlink" href="#setting-up-and-running-the-optimization-problem" title="Permalink to this headline"></a></h3>
+<p>Finally, we create the optimization problem, setting the objective and constraints.
+As before, we use the function <code class="xref py py-meth docutils literal notranslate"><span class="pre">FEASolver.addVariablesPyOpt</span></code> to add the variables associated with this structural solver to the optimization problem.
+As we will see later, if we included adjacency constraints, then similarly we must call <code class="docutils literal notranslate"><span class="pre">FEASolver.addConstraintsPyOpt</span></code> to add those as well.</p>
+</div>
+<div class="section" id="postprocessing">
+<h3>Postprocessing<a class="headerlink" href="#postprocessing" title="Permalink to this headline"></a></h3>
+<p>Once the optimization is complete, we can write out the results of the last run TACS analysis, which should be the optimum design.
+To view the history of the functions we saved during the optimization, we could use optView or, as we do here, you can directly read the history file back into python using pyOptSparse’s <code class="docutils literal notranslate"><span class="pre">History</span></code> class.
+The <code class="docutils literal notranslate"><span class="pre">getValues</span></code> method of the class will, by default, return a dictionary of arrays which contain the values of all our saved functions from each major optimiser iteration, along with other useful values such as optimality and feasibility.
+Using this method rather than optView allows you more control over what you plot and is also recommended if you want to make nice looking history plots for any kind of publication.</p>
+<img alt="_images/StructOptHist.png" src="_images/StructOptHist.png" />
+<img alt="_images/StructOptComparison.png" src="_images/StructOptComparison.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="opt_overview.html" class="btn btn-neutral float-left" title="Structural and Aerostructural Optimization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="opt_aerostruct.html" class="btn btn-neutral float-right" title="Aerostructural Optimization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, MDO Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
